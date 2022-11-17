@@ -97,10 +97,7 @@ def read_header(fid):
     # the data acquisition.
     (notch_filter_mode,) = struct.unpack("<h", fid.read(2))
     header["notch_filter_frequency"] = 0
-    if notch_filter_mode == 1:
-        header["notch_filter_frequency"] = 50
-    elif notch_filter_mode == 2:
-        header["notch_filter_frequency"] = 60
+    header["notch_filter_frequency"] = {1: 50, 2:60}[notch_filter_mode]
 
     (
         header["desired_impedance_test_frequency"],
