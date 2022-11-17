@@ -52,7 +52,7 @@ class Supplement(dj.Lookup):
 @schema
 class Induction(dj.Manual):
     definition = """
-    code: varchar(8)
+    induction_code: varchar(8)
     ---
     -> Family
     -> Passage
