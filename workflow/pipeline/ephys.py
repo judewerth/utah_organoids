@@ -1,6 +1,8 @@
 from element_array_ephys import probe
 from element_array_ephys import ephys_no_curation as ephys, ephys_report
 
+from .induction import OrganoidExperiment
+
 from workflow import db_prefix
 from workflow.pipeline import reference, session
 from workflow.utils.paths import (
@@ -15,12 +17,10 @@ __all__ = ["ephys", "ephys_report", "probe"]
 # ------------- Activate "ephys" schema -------------
 
 SkullReference = reference.SkullReference
-Session = session.Session
+Session = OrganoidExperiment
 
 if not ephys.schema.is_activated():
-    ephys.activate(
-        db_prefix + "ephys", db_prefix + "probe", linking_module=__name__
-    )
+    ephys.activate(db_prefix + "ephys", db_prefix + "probe", linking_module=__name__)
 
 
 # add a default kilosort2 paramset
