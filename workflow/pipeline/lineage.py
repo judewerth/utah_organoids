@@ -19,6 +19,7 @@ class Induction(dj.Manual):
     passage_id: int
     """
 
+
 class InductionSequence(dj.Part):
     definition = """
     induction_id: varchar(8)

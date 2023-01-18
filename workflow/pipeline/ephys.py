@@ -4,7 +4,7 @@ from element_array_ephys import ephys_no_curation as ephys, ephys_report
 from .induction import OrganoidExperiment
 
 from workflow import db_prefix
-from workflow.pipeline import reference, session
+from workflow.pipeline import reference
 from workflow.utils.paths import (
     get_ephys_root_data_dir,
     get_processed_root_data_dir,
