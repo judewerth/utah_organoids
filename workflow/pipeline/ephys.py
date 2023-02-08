@@ -1,19 +1,26 @@
 from element_array_ephys import probe
 from element_array_ephys import ephys_no_curation as ephys, ephys_report
-
+from element_event import trial, event
 from .induction import OrganoidExperiment
+from . import reference
 
 from workflow import db_prefix
 from workflow.pipeline import reference
+from workflow.utils.paths import (
+    get_ephys_root_data_dir,
+    get_processed_root_data_dir,
+    get_session_dir,
+)
 
+__all__ = ["ephys", "ephys_report", "probe", "trial", "event"]
 
-__all__ = ["ephys", "ephys_report", "probe"]
+# Activate "event" and "trial" schema ---------------------------------
+Session = OrganoidExperiment
 
+trial.activate(db_prefix + "trial", db_prefix + "event", linking_module=__name__)
 
 # ------------- Activate "ephys" schema -------------
-
 SkullReference = reference.SkullReference
-Session = OrganoidExperiment
 
 if not ephys.schema.is_activated():
     ephys.activate(db_prefix + "ephys", db_prefix + "probe", linking_module=__name__)
