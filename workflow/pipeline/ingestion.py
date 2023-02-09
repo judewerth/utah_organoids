@@ -8,7 +8,7 @@ from element_interface.utils import find_full_path
 
 from workflow import db_prefix
 from workflow.pipeline import ephys, induction, probe
-from workflow.utils import get_ephys_root_data_dir, get_session_dir
+from workflow.utils.paths import get_ephys_root_data_dir, get_session_dir
 
 logger = dj.logger
 schema = dj.schema(db_prefix + "ingestion")
@@ -17,7 +17,7 @@ schema = dj.schema(db_prefix + "ingestion")
 @schema
 class EphysIngestion(dj.Imported):
     definition = """
-    -> session.Session
+    -> induction.OrganoidExperiment
     ---
     ingestion_time  : datetime    # Stores the start time of ephys data ingestion
     """
@@ -30,8 +30,8 @@ class EphysIngestion(dj.Imported):
         # Fill in dummy probe config
         insertion_number = 0
         ephys.ProbeInsertion.insert1(
-            key
-            | {
+            {
+                **key,
                 "insertion_number": insertion_number,
                 "probe": probe_info["serial_number"],
             },
@@ -40,9 +40,7 @@ class EphysIngestion(dj.Imported):
 
         # Populate the probe schema
         # Fill in dummy parameters including probe config
-        electrode_layouts = probe.build_electrode_layouts(
-            {"probe_type": probe_info["type"]} | probe_info["config"]
-        )
+        electrode_layouts = probe.build_electrode_layouts(**probe_info["config"])
 
         probe.ProbeType.insert1(
             dict(probe_type=probe_info["type"]), skip_duplicates=True
@@ -121,9 +119,9 @@ class EphysIngestion(dj.Imported):
 
         # Populate ephys.EphysRecording
         ephys.EphysRecording.insert1(
-            key
-            | econfig
-            | {
+            {
+                **key,
+                **econfig,
                 "insertion_number": insertion_number,
                 "acq_software": "Intan",
                 "sampling_rate": lfp_sampling_rate,
@@ -139,8 +137,8 @@ class EphysIngestion(dj.Imported):
 
         # Populate ephys.LFP
         ephys.LFP.insert1(
-            key
-            | {
+            {
+                **key,
                 "insertion_number": insertion_number,
                 "lfp_sampling_rate": lfp_sampling_rate,
                 "lfp_time_stamps": timestamp_concat,
@@ -163,7 +161,7 @@ class EphysIngestion(dj.Imported):
 
         for recorded_site in lfp_channels:
             ephys.LFP.Electrode.insert1(
-                key | {"lfp": data["recordings"][recorded_site]},
+                {**key, "lfp": data["recordings"][recorded_site]},
                 allow_direct_insert=True,
             )
 
