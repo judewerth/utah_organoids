@@ -157,10 +157,3 @@ class EphysIngestion(dj.Imported):
                 },
                 allow_direct_insert=True,
             )
-
-        # Save concatenated LFP in "continuous.dat" for cluster cutting in the same session folder.
-        continuous_file = session_dir / "continuous.dat"
-        memmap_arr = np.memmap(
-            continuous_file, dtype=np.float64, mode="w+", shape=lfp_amp_concat.shape
-        )
-        memmap_arr[:] = lfp_amp_concat[:]

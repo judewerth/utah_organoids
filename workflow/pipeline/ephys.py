@@ -15,7 +15,7 @@ __all__ = ["ephys", "ephys_report", "probe"]
 
 @ephys.schema
 class RawEphys(dj.Imported):
-    definition="""
+    definition = """
     -> Subject
     probe_id:       int
     start_time:     datetime # date and time of file creation
@@ -26,28 +26,29 @@ class RawEphys(dj.Imported):
     sampling_rate:  float # (Hz)
     header:         longblob  # meta information about the file.
     """
-    
+
     class Channel(dj.Part):
-        definition="""
+        definition = """
         -> master
         channel_id : varchar(16)
         ---
         lfp:         blob@store  # LFP recording at this electrode in microvolts.
         """
 
-    def make(self, key): ...
-        
-        
+    def make(self, key):
+        ...
+
+
 @ephys.schema
 class EphysSession(dj.Manual):
     # activate the ephys element
-    definition="""
+    definition = """
     -> OrganoidExperiment
     start_time : datetime
     end_time : datetime
     """
-    
-    
+
+
 Session = EphysSession
 SkullReference = reference.SkullReference
 

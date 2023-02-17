@@ -49,6 +49,21 @@ def array_generator(arr: np.array, chunk_size: int = 10):
         start_ind += chunk_size
 
 
+def make_continuous_dat(save_dir: Path, arr: np.array):
+    """Save concatenated LFP in "continuous.dat" for cluster cutting.
+
+    Args:
+        save_dir (Path): Path to the save directory.
+        arr (np.array): concatenated LFP array.
+    """
+    #
+    continuous_file = save_dir / "continuous.dat"
+    memmap_arr = np.memmap(
+        continuous_file, dtype=np.float64, mode="w+", shape=arr.shape
+    )
+    memmap_arr[:] = arr[:]
+
+
 def read_continuous_dat(file: Path, nb_channels: int) -> np.memmap:
     """Reads continuous.dat file
 
