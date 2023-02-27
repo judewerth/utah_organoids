@@ -1,32 +1,27 @@
 from pathlib import Path
 from typing import Any
 
+import datajoint as dj
 import numpy as np
+import yaml
 from element_interface.intanloader import load_file
 from element_interface.utils import find_full_path
 
-from workflow.utils.paths import get_ephys_root_data_dir, get_session_dir
+from workflow.pipeline import probe
+from workflow.utils.paths import get_ephys_root_data_dir, get_session_directory
+
+logger = dj.logger
 
 
-def get_probe_info(session_key: dict[str, Any]) -> dict[str, Any]:
-    """Find probe.yaml in a session folder
-
-    Args:
-        session_key (dict[str, Any]): session key
-
-    Returns:
-        dict[str, Any]: probe meta information
-    """
-    import yaml
-
-    experiment_dir = find_full_path(
-        get_ephys_root_data_dir(), get_session_dir(session_key)
-    )
-
-    probe_meta_file = next(experiment_dir.glob("probe*"))
-
-    with open(probe_meta_file, "r") as f:
-        return yaml.safe_load(f)
+def get_probe_info() -> list[dict]:
+    """Find probe.yaml in the root directory."""
+    try:
+        probe_meta_file = next(get_ephys_root_data_dir().glob("probe.yaml"))
+    except StopIteration:
+        raise FileNotFoundError("probe.yaml not found in the root data directory")
+    else:
+        with open(probe_meta_file, "r") as f:
+            return yaml.safe_load(f)
 
 
 def array_generator(arr: np.array, chunk_size: int = 10):

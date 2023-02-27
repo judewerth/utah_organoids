@@ -17,7 +17,7 @@ def get_processed_root_data_dir() -> Path:
     return Path(dj.config.get("custom", {}).get("processed_root_data_dir", None))
 
 
-def get_session_dir(session_key: dict) -> Path:
+def get_session_directory(session_key: dict) -> Path:
     return Path(
         get_ephys_root_data_dir()
         / (induction.OrganoidExperiment & session_key).fetch1("experiment_dir")
