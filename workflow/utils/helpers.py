@@ -6,6 +6,7 @@ import numpy as np
 import yaml
 from element_interface.intanloader import load_file
 from element_interface.utils import find_full_path
+
 from workflow.pipeline import probe
 from workflow.utils.paths import get_ephys_root_data_dir, get_session_directory
 
@@ -45,14 +46,16 @@ def ingest_probe() -> None:
             ),
             skip_duplicates=True,
         )
-        
+
         # Insert into probe.ElectrodeConfig & probe.ElectrodeConfig.Electrode
         probe_type = probe_config["config"]["probe_type"]
         electrode_keys = [
-                        {"probe_type": probe_type, "electrode": e}
-                        for e in probe_config["channel_to_electrode_map"].values()
-                    ]
-        probe.generate_electrode_config(probe_type, electrode_keys, electrode_config_name=probe_config_id)
+            {"probe_type": probe_type, "channel": c, "electrode": e}
+            for c, e in probe_config["channel_to_electrode_map"].items()
+        ]
+        probe.generate_electrode_config(
+            probe_type, electrode_keys, electrode_config_name=probe_config_id
+        )
 
 
 def array_generator(arr: np.array, chunk_size: int = 10):
