@@ -72,7 +72,7 @@ class LFPSpectrogram(dj.Computed):
         """
         lfp_sampling_rate, window_size, overlap_size = (
             ephys.LFP.Trace * ephys.LFP * SpectrogramParameters & key
-        ).fetch(
+        ).fetch1(
             "lfp_sampling_rate",
             "window_size",
             "overlap_size",
