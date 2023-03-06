@@ -1,19 +1,10 @@
 import datajoint as dj
-from .ephys import ephys, event
+from .ephys import ephys
 from workflow import db_prefix
 from scipy import signal
 import numpy as np
 
 schema = dj.schema(db_prefix + "analysis")
-
-
-@schema
-class Impedence(dj.Imported):
-    definition = """
-    -> ephys.EphysRecording
-    ---
-    value: float
-    """
 
 
 @schema
@@ -49,15 +40,13 @@ class SpectrogramParameters(dj.Lookup):
 @schema
 class LFPSpectrogram(dj.Computed):
     definition = """
-    -> ephys.LFP
+    -> ephys.LFP.Trace
     -> SpectrogramParameters
-    -> event.AlignmentEvent
     """
 
     class ChannelSpectrogram(dj.Part):
         definition = """
         -> master
-        -> ephys.LFP.Electrode
         ---
         spectrogram: longblob # Power with dimensions (frequecy, time).
         time: longblob        # Timestamps
@@ -66,47 +55,33 @@ class LFPSpectrogram(dj.Computed):
 
     class Power(dj.Part):
         definition = """
-        -> master.ChannelSpectrogram
+        -> master
         -> SpectralBand
         ---
-        power: longblob
-        mean_power: float
-        std_power: float
+        power: longblob   # Power in spectral band as a function of time
+        mean_power: float # Mean power in a spectral band for a time window.
+        std_power: float  # Standard deviation of the power in a spectral band for a time window.
         """
 
     def make(self, key):
         """
         Assuming LFP at each channel is
-            1. bandpass 0.2Hz - 500Hz
-            2. notch-filter at 60Hz
-            3. resample to 1000Hz (Nyquist)
+            1. resample to 2500Hz (Nyquist)
+            2. notch-filter at 50/60Hz
+            3. lowpass filter at 1000Hz.
         """
-        lfp_time_stamps, lfp_sampling_rate, window_size, overlap_size = (
-            ephys.LFP * ephys.EphysRecording * SpectrogramParameters * SpectralBand
-            & key
+        lfp_sampling_rate, window_size, overlap_size = (
+            ephys.LFP.Trace * SpectrogramParameters * SpectralBand & key
         ).fetch(
-            "lfp_time_stamps",
             "lfp_sampling_rate",
             "window_size",
             "overlap_size",
         )
-        even_specs = (event.AlignmentEvent & key).fetch1()
-
-        start_time = (
-            event.Event & key & {"event_type": even_specs["start_event_type"]}
-        ).fetch("event_start_time")[0] + even_specs["start_time_shift"]
-        end_time = (
-            event.Event & key & {"event_type": even_specs["end_event_type"]}
-        ).fetch("event_start_time")[0] + even_specs["end_time_shift"]
-
-        time_mask = np.logical_and(
-            lfp_time_stamps >= start_time, lfp_time_stamps < end_time
-        )
 
         self.insert1(key)
-        for lfp_key, lfp in (ephys.LFP.Electrode & key).fetch("KEY", "lfp"):
+        for lfp_key, lfp in (ephys.LFP.Trace & key).fetch("KEY", "lfp"):
             f, t, Sxx = signal.spectrogram(
-                lfp[time_mask],
+                lfp,
                 fs=int(lfp_sampling_rate),
                 nperseg=int(window_size * lfp_sampling_rate),
                 noverlap=int(overlap_size * lfp_sampling_rate),
@@ -123,7 +98,7 @@ class LFPSpectrogram(dj.Computed):
                 power = Sxx[freq_mask, :].mean(axis=0)  # mean across freq domain
                 self.Power.insert1(
                     {
-                        **key,
+                        **power_key,
                         **lfp_key,
                         "power": power,
                         "mean_power": power.mean(),
