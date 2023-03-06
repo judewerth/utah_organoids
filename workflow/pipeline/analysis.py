@@ -81,7 +81,7 @@ class LFPSpectrogram(dj.Computed):
         self.insert1(key)
 
         lfp_key, lfp = (ephys.LFP.Trace & key).fetch1("KEY", "lfp")
-        f, t, Sxx = signal.spectrogram(
+        frequency, time, Sxx = signal.spectrogram(
             lfp,
             fs=int(lfp_sampling_rate),
             nperseg=int(window_size * lfp_sampling_rate),
@@ -90,11 +90,11 @@ class LFPSpectrogram(dj.Computed):
         )
 
         self.ChannelSpectrogram.insert1(
-            {**key, **lfp_key, "spectrogram": Sxx, "frequency": f, "time": t}
+            {**key, **lfp_key, "spectrogram": Sxx, "frequency": frequency, "time": time}
         )
         k, l, u = SpectralBand.fetch("KEY", "lower_freq", "upper_freq")
         for power_key, fl, fh in zip(k, l, u):
-            freq_mask = np.logical_and(f >= fl, f < fh)
+            freq_mask = np.logical_and(frequency >= fl, frequency < fh)
             power = Sxx[freq_mask, :].mean(axis=0)  # mean across freq domain
             self.Power.insert1(
                 dict(
