@@ -39,3 +39,27 @@ def upload_session_data(session_dir_relpath):
         session=s3_session,
         s3_bucket=s3_bucket,
     )
+
+    remote_files = [
+        (
+            pathlib.Path(x["key"]).relative_to(f"{PROJECT_NAME}/inbox").as_posix(),
+            x["_size"],
+        )
+        for x in dj_axon.list_files(
+            session=s3_session,
+            s3_bucket=s3_bucket,
+            s3_prefix=dj_session_dir,
+            as_tree=False,
+        )
+    ]
+
+    local_files = []
+    for f in local_session_dir.rglob("*"):
+        if f.is_file():
+            local_files.append(
+                (f.relative_to(LOCAL_OUTBOX).as_posix(), f.stat().st_size)
+            )
+
+    if local_files.sort() == remote_files.sort():
+        return True
+        # Delete the local files.
