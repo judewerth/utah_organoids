@@ -58,7 +58,7 @@ class LFPSpectrogram(dj.Computed):
         -> master
         -> SpectralBand
         ---
-        power: longblob   # Power in spectral band as a function of time
+        power: longblob   # Mean power in spectral band as a function of time
         mean_power: float # Mean power in a spectral band for a time window.
         std_power: float  # Standard deviation of the power in a spectral band for a time window.
         """
