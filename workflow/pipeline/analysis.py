@@ -64,12 +64,6 @@ class LFPSpectrogram(dj.Computed):
         """
 
     def make(self, key):
-        """
-        Assuming LFP at each channel is
-            1. resample to 2500Hz (Nyquist)
-            2. notch-filter at 50/60Hz
-            3. lowpass filter at 1000Hz.
-        """
         lfp_sampling_rate, window_size, overlap_size = (
             ephys.LFP * SpectrogramParameters & key
         ).fetch1(
