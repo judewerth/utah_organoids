@@ -16,7 +16,7 @@ class SpectralBand(dj.Lookup):
     upper_freq: float # (Hz)
     """
     contents = [
-        ("delta", 1.0, 4.0),
+        ("delta", 2.0, 4.0),
         ("theta", 4.0, 7.0),
         ("alpha", 8.0, 12.0),
         ("beta", 13.0, 30.0),
