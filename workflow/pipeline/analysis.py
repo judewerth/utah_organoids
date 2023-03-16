@@ -39,13 +39,14 @@ class SpectrogramParameters(dj.Lookup):
 
 @schema
 class LFPSpectrogram(dj.Computed):
-        """Calculate spectrogram at each channel.
-        
-        Assumes the LFP is:
-            1. Low-pass filtered at 1000 Hz.
-            2. Notch filtered at 50/60 Hz.
-            3. Resampled to 2500 Hz.
-        """
+    """Calculate spectrogram at each channel.
+
+    Assumes the LFP is:
+        1. Low-pass filtered at 1000 Hz.
+        2. Notch filtered at 50/60 Hz.
+        3. Resampled to 2500 Hz.
+    """
+
     definition = """
     -> ephys.LFP.Trace
     -> SpectrogramParameters
