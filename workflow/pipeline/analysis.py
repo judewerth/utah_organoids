@@ -16,12 +16,13 @@ class SpectralBand(dj.Lookup):
     upper_freq: float # (Hz)
     """
     contents = [
-        ("delta", 0.5, 4.0),
+        ("delta", 2.0, 4.0),
         ("theta", 4.0, 7.0),
         ("alpha", 8.0, 12.0),
-        ("beta", 18.0, 22.0),
-        ("gamma", 30.0, 70.0),
-        ("highgamma", 80.0, 500.0),
+        ("beta", 13.0, 30.0),
+        ("gamma", 30.0, 50.0),
+        ("highgamma1", 70.0, 110.0),
+        ("highgamma2", 130.0, 500.0),
     ]
 
 
@@ -34,18 +35,19 @@ class SpectrogramParameters(dj.Lookup):
     overlap_size=0:  float    # Time in seconds
     description="":  varchar(64)
     """
-    contents = [(0, 2.0, 0.0, "Default 2s time segments without overlap.")]
+    contents = [(0, 0.5, 0.0, "Default 0.5s time segments without overlap.")]
 
 
 @schema
 class LFPSpectrogram(dj.Computed):
-        """Calculate spectrogram at each channel.
-        
-        Assumes the LFP is:
-            1. Low-pass filtered at 1000 Hz.
-            2. Notch filtered at 50/60 Hz.
-            3. Resampled to 2500 Hz.
-        """
+    """Calculate spectrogram at each channel.
+
+    Assumes the LFP is:
+        1. Low-pass filtered at 1000 Hz.
+        2. Notch filtered at 50/60 Hz.
+        3. Resampled to 2500 Hz.
+    """
+
     definition = """
     -> ephys.LFP.Trace
     -> SpectrogramParameters
