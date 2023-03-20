@@ -3,10 +3,6 @@ DataJoint workflow for the Organoids project at the University of Utah
 
 ## Initial configuration instructions
 
-1. Clone `utah_organoids` repository
-    ```bash
-    git clone https://github.com/dj-sciops/utah_organoids.git
-    ```
 1. Install [git](https://git-scm.com/download/win)
 1. Install [conda](https://docs.conda.io/en/latest/miniconda.html)
 1. Create conda environment
@@ -16,6 +12,10 @@ DataJoint workflow for the Organoids project at the University of Utah
 1. Activate conda environment
     ```bash
     conda activate djutah
+    ```
+1. Clone `utah_organoids` repository
+    ```bash
+    git clone https://github.com/dj-sciops/utah_organoids.git
     ```
 1. Within `utah_organoids` directory install the package
     ```bash
