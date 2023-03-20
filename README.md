@@ -52,9 +52,14 @@ DataJoint workflow for the Organoids project at the University of Utah
     Anaconda Prompt (miniconda3)
     ```
 
-1. Activate conda environment.
+1. Activate the conda environment by typing the following in the command prompt:
     ```bash
     conda activate djutah
+    ```
+
+1. Open a python interpreter by typing the following in the command prompt:
+    ```bash
+    ipython
     ```
 
 1. Run data upload for a single session.
