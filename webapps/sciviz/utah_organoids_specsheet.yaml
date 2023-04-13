@@ -3,7 +3,7 @@ LabBook: null
 SciViz: # top level tab
   auth:
     mode: "database"
-  hostname: "tutorial-db.datajoint.io"
+  hostname: "rds.datajoint.io"
   pages: # individual pages
     Home:
       route: /home
