@@ -91,6 +91,60 @@ class InductionCultureDNA(dj.Manual):
 
 
 @schema
+class PostInductionCulture(dj.Manual):
+    definition = """
+    -> InductionCulture
+    well_id: int
+    """
+
+
+@schema
+class PostInductionCultureCondition(dj.Manual):
+    definition = """
+    -> PostInductionCulture
+    post_induction_condition_date: date
+    ---
+    post_induction_step: enum('ipsc_replate', 'induction_start', 'media_change')
+    media_change=null: bool
+    density=null: int               # units of percentage
+    discontinued=null: bool
+    post_induction_condition_note='': varchar(256)
+    """
+
+
+@schema
+class PostInductionCultureSupplement(dj.Manual):
+    definition = """
+    -> PostInductionCultureCondition
+    supplement: varchar(32)
+    ---
+    concentration: int 
+    units: enum('micromolar', 'ng/mL')
+    """
+
+
+@schema
+class PostInductionCultureMedia(dj.Manual):
+    definition = """
+    -> PostInductionCultureCondition
+    media_name: varchar(32)
+    ---
+    percent_media_changed: int      # Percentage of the media used in the culture, 1-100
+    manufacturer='': varchar(32)
+    catalog_number='': varchar(32)
+    media_note='': varchar(256)
+    """
+
+
+@schema
+class PostInductionCultureSubstrate(dj.Manual):
+    definition = """
+    -> PostInductionCultureCondition
+    substrate: varchar(32)          # matrigel
+    """
+
+
+@schema
 class RosetteCulture(dj.Manual):
     definition = """
     -> InductionCulture
