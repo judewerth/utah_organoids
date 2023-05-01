@@ -2,6 +2,8 @@
 
 DataJoint workflow for the Organoids project at the University of Utah.
 
+![culture diagram](./images/culture_diagram.png)
+
 ## Initial configuration instructions
 
 1. Install [git](https://git-scm.com/download/win)
