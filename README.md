@@ -2,9 +2,11 @@
 
 DataJoint workflow for the Organoids project at the University of Utah.
 
-![culture diagram](./images/culture_diagram.png)
+## Organoids Creation Protocol Flowchart
 
-## Initial configuration instructions
+<img src=./images/culture_diagram.png width="50%">
+
+## Initial Configuration Instructions
 
 1. Install [git](https://git-scm.com/download/win)
 1. Install [conda](https://docs.conda.io/en/latest/miniconda.html)
@@ -48,7 +50,7 @@ DataJoint workflow for the Organoids project at the University of Utah.
         7. `role`
         8. `local_outbox`
 
-## Data upload
+## Data Upload Instructions
 
 1. On Windows, open the command prompt application by searching for the following:
     ```
