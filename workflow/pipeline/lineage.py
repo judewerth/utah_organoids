@@ -16,7 +16,9 @@ class Lineage(dj.Manual):
     family: varchar(8)
     line: varchar(8)
     passage_id: int
+    lineage_note='': varchar(256)
     """
+
 
 @schema
 class LineageSequence(dj.Manual):
