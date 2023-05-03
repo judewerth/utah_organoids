@@ -1,4 +1,4 @@
-# docker-compose up
+# docker compose up
 #
 # Access using fakeservices.datajoint.io
 version: '2.4'
@@ -6,7 +6,7 @@ services:
   pharus:
     cpus: 0.50
     mem_limit: 512m
-    image: datajoint/pharus:0.8.4
+    image: datajoint/pharus:0.8.5
     environment:
       PHARUS_SPEC_PATH: /main/specs/utah_organoids_specsheet.yaml
       PHARUS_MODE: DEV  # DEV | PROD
@@ -22,7 +22,7 @@ services:
   sci-viz:
     cpus: 2.0
     mem_limit: 8g
-    image: datajoint/sci-viz:2.2.1
+    image: datajoint/sci-viz:2.3.2
     environment:
       - CHOKIDAR_USEPOLLING=true
       - REACT_APP_DJSCIVIZ_BACKEND_PREFIX=/api
