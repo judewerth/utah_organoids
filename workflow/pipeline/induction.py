@@ -19,9 +19,17 @@ class User(dj.Manual):
 
 @schema
 class InductionCulture(dj.Manual):
-    definition = """
+    definition = """ # Plate contains 6 wells
     -> lineage.Lineage
-    dish_id: int
+    induction_plate_id: varchar(4)
+    """
+
+
+@schema
+class InductionCultureWell(dj.Manual):
+    definition = """ # Plate contains 6 wells
+    -> InductionCulture
+    induction_well_id: int
     """
 
 
