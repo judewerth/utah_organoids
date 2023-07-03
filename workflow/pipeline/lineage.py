@@ -11,7 +11,7 @@ schema = dj.schema(DB_PREFIX + "lineage")
 @schema
 class Lineage(dj.Manual):
     definition = """
-    induction_id: varchar(8)     # de-identified code
+    induction_id: varchar(8)     # de-identified code (e.g. hmau001)
     ---
     family: varchar(8)
     line: varchar(8)
