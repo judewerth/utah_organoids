@@ -350,7 +350,7 @@ SciViz: # top level tab
             Induction Culture Image:
               route: /inductioncultureimageform
               x: 0
-              y: 9
+              y: 8
               height: 1
               width: 1
               type: form
@@ -363,7 +363,7 @@ SciViz: # top level tab
             Induction Culture DNA:
               route: /inductionculturednaform
               x: 0
-              y: 10
+              y: 9
               height: 1
               width: 1
               type: form
@@ -910,8 +910,8 @@ SciViz: # top level tab
                   input: Organoid Culture
                   destination: utah_organoids_induction.OrganoidCulture
                 - type: table
-                  input: Rosette Culture
-                  destination: utah_organoids_induction.RosetteCulture
+                  input: Rosette Culture Well
+                  destination: utah_organoids_induction.RosetteCultureWell
             Organoid Culture Condition:
               route: /organoidcultureconditionform
               x: 0
