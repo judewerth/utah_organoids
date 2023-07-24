@@ -239,7 +239,7 @@ class RosetteCultureImage(dj.Manual):
 @schema
 class Experiment(dj.Manual):
     definition = """
-    experiment_id: varchar(8) # i.e. rosette id and organoid id, e.g. AS001
+    experiment_id: varchar(4) # i.e. rosette id and organoid id, e.g. O001
     """
 
 
