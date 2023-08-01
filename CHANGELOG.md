@@ -3,18 +3,19 @@
 Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) convention.
 
-## 0.2.0 - Unreleased
+## 0.2.0
 
-+ Update - SciViz specification sheet to change layout
++ Update - SciViz layout to display table view and form on same tab
++ Update - Convert datatypes to `unsigned`
 
-## 0.1.2 - Unreleased
+## 0.1.2
 
 + Update - SciViz version
 
-## 0.1.1 - Unreleased
+## 0.1.1
 
 + Fix - SciViz mapping input
 
-## 0.1.0 - Unreleased
+## 0.1.0
 
 + First pass
