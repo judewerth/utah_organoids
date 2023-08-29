@@ -21,15 +21,10 @@ class User(dj.Manual):
 class InductionCulture(dj.Manual):
     definition = """ # Plate contains 6 wells
     -> lineage.Lineage
-    induction_plate_id: varchar(32)
-    """
-
-
-@schema
-class InductionCultureWell(dj.Manual):
-    definition = """ # Plate contains 6 wells
-    -> InductionCulture
-    induction_well_id: int unsigned
+    induction_culture_date: date
+    induction_culture_plate: int unsigned
+    ---
+    induction_culture_wells: varchar(8)    # Ranges of wells occupied (e.g. 1-3)
     """
 
 
@@ -37,7 +32,7 @@ class InductionCultureWell(dj.Manual):
 class InductionCultureCondition(dj.Manual):
     definition = """
     -> InductionCulture
-    induction_condition_date: date
+    induction_condition_datetime: datetime
     ---
     induction_step: enum('ipsc_replate', 'induction_start', 'media_change')
     media_change=null: bool
@@ -102,15 +97,10 @@ class InductionCultureDNA(dj.Manual):
 class PostInductionCulture(dj.Manual):
     definition = """ # Plate contains 6 wells
     -> InductionCulture
-    post_induction_plate_id: varchar(32)
-    """
-
-
-@schema
-class PostInductionCultureWell(dj.Manual):
-    definition = """ # Plate contains 6 wells
-    -> PostInductionCulture
-    post_induction_well_id: int unsigned
+    post_induction_culture_date: date
+    post_induction_culture_plate: int unsigned
+    ---
+    post_induction_culture_wells: varchar(8)    # Ranges of wells occupied (e.g. 1-3)
     """
 
 
@@ -118,7 +108,7 @@ class PostInductionCultureWell(dj.Manual):
 class PostInductionCultureCondition(dj.Manual):
     definition = """
     -> PostInductionCulture
-    post_induction_condition_date: date
+    post_induction_condition_datetime: datetime
     ---
     post_induction_step: enum('ipsc_replate', 'post_induction_start', 'media_change')
     media_change=null: bool
@@ -129,49 +119,14 @@ class PostInductionCultureCondition(dj.Manual):
 
 
 @schema
-class PostInductionCultureSupplement(dj.Manual):
-    definition = """
-    -> PostInductionCultureCondition
-    supplement: enum('EGF+FGF', 'EGF', 'FGF')
-    ---
-    concentration: int unsigned 
-    units: enum('micromolar', 'ng/mL')
-    """
-
-
-@schema
-class PostInductionCultureMedia(dj.Manual):
-    definition = """
-    -> PostInductionCultureCondition
-    media_name: varchar(32)
-    ---
-    percent_media_changed: int unsigned      # Percentage of the media used in the culture, 1-100
-    manufacturer='': varchar(32)
-    catalog_number='': varchar(32)
-    media_note='': varchar(256)
-    """
-
-
-@schema
-class PostInductionCultureSubstrate(dj.Manual):
-    definition = """
-    -> PostInductionCultureCondition
-    substrate: varchar(32)          # matrigel
-    """
-
-
-@schema
-class RosetteCulture(dj.Manual):
+class IsolatedRosetteCulture(dj.Manual):
     definition = """ # Plate contains 96 wells (12 columns, 8 rows)
     -> PostInductionCulture
-    rosette_plate_id: varchar(32)
+    isolated_rosette_culture_date: date       # Date for isolating the rosette
+    isolated_rosette_culture_plate: int unsigned
     ---
-    -> User
-    single_rosette_date: date   # date for picking rosette
-    induction_date: date
-    amplification_date: date    # egf fgf treatment
-
-    unique index (induction_id, induction_plate_id, post_induction_plate_id, rosette_plate_id)
+    isolated_rosette_culture_wells: varchar(8)        # Ranges of wells occupied (e.g. A1-B2)
+    amplification_date=null: date    # Date of EGF+FGF treatment
     """
 
 
@@ -195,13 +150,13 @@ class RosetteCultureCondition(dj.Manual):
 
 
 @schema
-class RosetteCultureSupplement(dj.Manual):
-    definition = """
-    -> RosetteCultureCondition
-    supplement: enum('EGF+FGF', 'EGF', 'FGF')
+class OrganoidCulture(dj.Manual):
+    definition = """ # Each organoid is embedded in a matrigel droplet, and multiple organoids are embedded in a 10cm dish for up to 5 months
+    -> IsolatedRosetteCulture
+    organoid_culture_date: date
+    organoid_culture_plate: int unsigned
     ---
-    concentration: int unsigned 
-    units: enum('micromolar', 'ng/mL')
+    isolated_rosette_culture_wells: varchar(8)    # Wells from the 96-well plate used to embed organoids
     """
 
 
@@ -244,85 +199,26 @@ class Experiment(dj.Manual):
 
 
 @schema
-class RosetteExperiment(dj.Manual):
+class IsolatedRosetteExperiment(dj.Manual):
     definition = """
-    -> RosetteCulture
-    experiment_datetime: datetime    # Experiment start time
+    -> Experiment
+    experiment_datetime: datetime         # Experiment start date and time
+    -> IsolatedRosetteCulture
     ---
-    -> [nullable] Experiment
-    experiment_plan: varchar(64) # mrna lysate, oct, protein lysate, or matrigel embedding
-    experiment_directory='':      varchar(256) # Path to the subject data directory
-    """
-
-
-@schema
-class OrganoidCulture(dj.Manual):
-    definition = """ # Organoids embedded in matrigel 10cm dish for up to 5 months
-    -> lineage.Lineage
-    organoid_plate_id: varchar(32)
-    ---
-    organoid_embed_date: date
-    """
-
-
-@schema
-class OrganoidEmbedding(dj.Manual):
-    definition = """ # Each organoid is in a matrigel droplet, and multiple organoids are embedded in dish
-    -> OrganoidCulture
-    -> RosetteCultureWell
-    """
-
-
-@schema
-class OrganoidCultureCondition(dj.Manual):
-    definition = """
-    -> OrganoidCulture
-    organoid_condition_date: date
-    ---
-    organoid_relative_day=null: int unsigned # relative to date for organoid embedding
-    organoid_condition_note='': varchar(256)
-    """
-
-
-@schema
-class OrganoidCultureSupplement(dj.Manual):
-    definition = """
-    -> OrganoidCultureCondition
-    supplement: varchar(32)
-    ---
-    concentration: int unsigned 
-    units: enum('micromolar', 'ng/mL')
-    """
-
-
-@schema
-class OrganoidCultureMedia(dj.Manual):
-    definition = """
-    -> OrganoidCultureCondition
-    media_name: varchar(32)
-    ---
-    media_amount: int unsigned        # Percentage of the media used in the culture, 1-100
-    manufacturer='': varchar(32)
-    catalog_number='': varchar(32)
-    media_note='': varchar(256)
-    """
-
-
-@schema
-class OrganoidCultureSubstrate(dj.Manual):
-    definition = """
-    -> OrganoidCultureCondition
-    substrate: varchar(32)
+    -> [nullable] User
+    experiment_plan: varchar(64)          # e.g. mrna lysate, oct, protein lysate, or matrigel embedding
+    experiment_directory='': varchar(256) # Path to the subject data directory
     """
 
 
 @schema
 class OrganoidExperiment(dj.Manual):
     definition = """
-    -> OrganoidCulture
     -> Experiment
-    experiment_datetime: datetime    # Experiment start time
+    experiment_datetime: datetime           # Experiment start date and time
+    -> OrganoidCulture
     ---
-    experiment_directory:      varchar(256) # Path to the subject data directory
-    experiment_plan:     varchar(64) # ephys, tracing
+    -> [nullable] User
+    experiment_plan: varchar(64)            # e.g. ephys, tracing
+    experiment_directory='': varchar(256)   # Path to the subject data directory
     """
