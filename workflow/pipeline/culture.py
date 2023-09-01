@@ -7,7 +7,7 @@ if "custom" not in dj.config:
 
 DB_PREFIX = dj.config["custom"].get("database.prefix", "")
 
-schema = dj.schema(DB_PREFIX + "induction")
+schema = dj.schema(DB_PREFIX + "culture")
 
 
 @schema
@@ -25,6 +25,7 @@ class InductionCulture(dj.Manual):
     induction_culture_plate: int unsigned
     ---
     induction_culture_wells: varchar(8)    # Ranges of wells occupied (e.g. 1-3)
+    induction_culture_note='': varchar(256)
     """
 
 
@@ -36,17 +37,16 @@ class InductionCultureCondition(dj.Manual):
     ---
     induction_step: enum('ipsc_replate', 'induction_start', 'media_change')
     -> [nullable] User
-    density=null: int unsigned          # Units of percentage
-    discontinued=null: bool
-    supplement=null: enum('Dorsomorphin 10ng/mL + SB431542 4ng/mL', 'Dorsomorphin 10ng/mL', 'SB431542 4ng/mL') # Supplement, concentration, and units
-    media=null: enum('N2B27')
+    density=null: int unsigned # Units of percentage
+    quality='': varchar(32) # e.g. cell detach, cell death, color change, morphology change
+    supplement=null: enum('','Dorsomorphin 10ng/mL + SB431542 4ng/mL', 'Dorsomorphin 10ng/mL', 'SB431542 4ng/mL') # Supplement, concentration, and units
+    media=null: enum('','N2B27')
     media_percent_changed=null: int unsigned # Percent of the media changed, 1-100
-    media_manufacturer='': varchar(32)
-    media_catalog_number='': varchar(32)
-    substrate=null: enum('matrigel')
+    substrate=null: enum('','matrigel')
     induction_condition_image_directory='': varchar(256) # Images stored with "id_datetime" naming convention.
     genomic_dna=null: bool # Was genomic DNA collected?
     induction_condition_note='': varchar(256)
+    discontinued=null: bool
     """
 
 
@@ -70,15 +70,14 @@ class PostInductionCultureCondition(dj.Manual):
     post_induction_step: enum('ipsc_replate', 'post_induction_start', 'media_change')
     -> [nullable] User
     density=null: int unsigned               # units of percentage
-    discontinued=null: bool
+    quality='': varchar(32) # e.g. cell detach, cell death, color change, morphology change
     supplement=null: enum('EGF+FGF 10 ng/mL', 'EGF', 'FGF') # Supplement, concentration, and units
     media=null: enum('N2B27')
     media_percent_changed=null: int unsigned  # Percent of the media changed, 1-100
-    media_manufacturer='': varchar(32)
-    media_catalog_number='': varchar(32)
     substrate=null: enum('matrigel')
     post_induction_condition_image_directory='': varchar(256) # Images stored with "id_datetime" naming convention.
     post_induction_condition_note='': varchar(256)
+    discontinued=null: bool
     """
 
 
@@ -86,11 +85,13 @@ class PostInductionCultureCondition(dj.Manual):
 class IsolatedRosetteCulture(dj.Manual):
     definition = """ # Plate contains 96 wells (12 columns, 8 rows)
     -> PostInductionCulture
-    isolated_rosette_culture_date: date       # Date for isolating the rosette
+    isolated_rosette_culture_date: date         # Date for isolating the rosette
     isolated_rosette_culture_plate: int unsigned
     ---
-    isolated_rosette_culture_wells: varchar(8)        # Ranges of wells occupied (e.g. A1-B2)
-    amplification_date=null: date    # Date of EGF+FGF treatment
+    isolated_rosette_culture_wells: varchar(8)  # Ranges of wells occupied (e.g. A1-B2)
+    size=null: int unsigned   # Units of millimeters
+    number_of_lumen=null: int unsigned
+    isolated_rosette_culture_note='': varchar(256)
     """
 
 
@@ -101,12 +102,10 @@ class IsolatedRosetteCultureCondition(dj.Manual):
     isolated_rosette_condition_datetime: datetime
     ---
     -> [nullable] User
-    rosette_relative_day=null: int unsigned # relative to date for picking rosette
+    quality='': varchar(32) # e.g. cell detach, cell death, color change, morphology change
     supplement=null: enum('EGF+FGF 10 ng/mL', 'EGF', 'FGF') # Supplement, concentration, and units
-    media='': varchar(32)
+    media=null: enum('N2B27')
     media_percent_changed=null: int unsigned  # Percent of the media changed, 1-100
-    media_manufacturer='': varchar(32)
-    media_catalog_number='': varchar(32)
     substrate=null: enum('matrigel')
     isolated_rosette_condition_image_directory='': varchar(256) # Images stored with "id_datetime" naming convention.
     isolated_rosette_condition_note='': varchar(256)
@@ -131,11 +130,10 @@ class OrganoidCultureCondition(dj.Manual):
     organoid_condition_datetime: datetime
     ---
     -> [nullable] User
+    quality='': varchar(32) # e.g. cell detach, cell death, color change, morphology change
     supplement='': varchar(32)
     media='': varchar(32)
     media_percent_changed=null: int unsigned # Percent of the media changed, 1-100
-    media_manufacturer='': varchar(32)
-    media_catalog_number='': varchar(32)
     substrate=null: enum('matrigel')
     organoid_condition_image_directory='': varchar(256) # Images stored with "id_datetime" naming convention.
     organoid_condition_note='': varchar(256)
