@@ -389,9 +389,6 @@ SciViz: # top level tab
                 - type: table
                   input: User
                   destination: utah_organoids_culture.User
-                # - type: attribute
-                #   input: Substrate
-                #   destination: substrate
     Experiment:
       route: /experiment
       grids:
