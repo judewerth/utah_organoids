@@ -1,0 +1,48 @@
+1: # probe electrode configuration
+  serial_number: 0 # unique probe id (dummy number for now)
+  maker: NeuroNexus
+  comment:
+
+  config:
+    probe_type: A1x32-5mm-25-177
+    site_count_per_shank: 32
+    col_spacing:
+    row_spacing: 25
+    white_spacing: 50
+    col_count_per_shank: 1
+    shank_count: 1
+    shank_spacing:
+
+  channel_to_electrode_map:
+    "A-000": 0
+    "A-001": 2
+    "A-002": 4
+    "A-003": 6
+    "A-004": 8
+    "A-005": 10
+    "A-006": 12
+    "A-007": 14
+    "A-008": 16
+    "A-009": 18
+    "A-010": 20
+    "A-011": 22
+    "A-012": 24
+    "A-013": 26
+    "A-014": 28
+    "A-015": 30
+    "A-016": 31
+    "A-017": 29
+    "A-018": 27
+    "A-019": 25
+    "A-020": 23
+    "A-021": 21
+    "A-022": 19
+    "A-023": 17
+    "A-024": 15
+    "A-025": 13
+    "A-026": 11
+    "A-027": 9
+    "A-028": 7
+    "A-029": 5
+    "A-030": 3
+    "A-031": 1
