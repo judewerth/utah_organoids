@@ -154,9 +154,15 @@ class Experiment(dj.Manual):
 
 
 @schema
-class ExperimentDirectory(dj.Manual):
-    definition = """
-    -> Experiment
+class Drug(dj.Lookup):
+    definition = """  # Drug treated on the organoid culture
+    drug_name       : varchar(24)
     ---
-    experiment_directory: varchar(256)   # Path to the subject data directory for long term recordings
+    drug_type=null  : varchar(64)
     """
+    contents = [
+        ("No Drug", None),
+        ("4-AP", "K-channel blocker"),
+        ("Bicuculline", "GABA blocker"),
+        ("Tetrodotoxin", "Na channel blocker"),
+    ]
