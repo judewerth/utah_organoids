@@ -144,14 +144,12 @@ class OrganoidCultureCondition(dj.Manual):
 class Experiment(dj.Manual):
     definition = """ # Experiment to be performed on each organoid
     organoid_id                 : varchar(4) # e.g. O17
-    start_time                  : datetime
-    experiment_plan             : varchar(64) # e.g. mrna lysate, oct, protein lysate, or matrigel embedding, ephys, tracing
+    experiment_start_time       : datetime
     ---
-    end_time                    : datetime
+    experiment_end_time         : datetime
     -> [nullable] User
     -> [nullable] IsolatedRosetteCulture
     -> [nullable] OrganoidCulture
-    analysis method
     -> [nullable] culture.Drug
     drug_concentration=null     : float # concentration in uM
     experiment_plan             : varchar(64) # e.g. mrna lysate, oct, protein lysate, or matrigel embedding, ephys, tracing
