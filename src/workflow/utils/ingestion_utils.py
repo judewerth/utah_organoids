@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import re
 from datetime import datetime
 from pathlib import Path
@@ -59,10 +61,13 @@ def ingest_experiment():
             ).fetch1("file")
         )
     except:
-        organoid_yml = Path(get_repo_dir()) / "data/organoids.yml"
+        organoid_yml = Path(get_repo_dir()) / "data/experiment.yml"
     with open(organoid_yml, "r") as f:
         organoid_info: list[dict] = yaml.safe_load(f)
     culture.Experiment.insert(
+        organoid_info, skip_duplicates=True, ignore_extra_fields=True
+    )
+    culture.ExperimentDirectory.insert(
         organoid_info, skip_duplicates=True, ignore_extra_fields=True
     )
 

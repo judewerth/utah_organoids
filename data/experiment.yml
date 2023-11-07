@@ -1,65 +1,384 @@
-# Used to populate culture.Experiment
+# Used to populate culture.Experiment & culture.ExperimentDirectory
 - organoid_id: O09
-  experiment_datetime: "2023-05-18"
+  experiment_start_time: "2023-05-18 12:25:00"
+  experiment_end_time: "2023-05-18 18:15:00"
+  drug_name: 4-AP
+  drug_concentration: 100 # uM
   experiment_plan: ephys
   experiment_directory: O09-12_raw
 
 - organoid_id: O10
-  experiment_datetime: "2023-05-18"
+  experiment_start_time: "2023-05-18 12:25:00"
+  experiment_end_time: "2023-05-18 18:15:00"
+  drug_name: 4-AP
+  drug_concentration: 100 # uM
   experiment_plan: ephys
   experiment_directory: O09-12_raw
 
 - organoid_id: O11
-  experiment_datetime: "2023-05-18"
+  experiment_start_time: "2023-05-18 12:25:00"
+  experiment_end_time: "2023-05-18 18:15:00"
+  drug_name: 4-AP
+  drug_concentration: 100 # uM
   experiment_plan: ephys
   experiment_directory: O09-12_raw
 
 - organoid_id: O12
-  experiment_datetime: "2023-05-18"
+  experiment_start_time: "2023-05-18 12:25:00"
+  experiment_end_time: "2023-05-18 18:15:00"
+  drug_name: 4-AP
+  drug_concentration: 100 # uM
+  experiment_plan: ephys
+  experiment_directory: O09-12_raw
+
+- organoid_id: O09
+  experiment_start_time: "2023-05-18 18:15:00"
+  experiment_end_time: "2023-05-19 09:30:00"
+  drug_name: No Drug
+  drug_concentration:
+  experiment_plan: ephys
+  experiment_directory: O09-12_raw
+
+- organoid_id: O10
+  experiment_start_time: "2023-05-18 18:15:00"
+  experiment_end_time: "2023-05-19 09:30:00"
+  drug_name: No Drug
+  drug_concentration:
+  experiment_plan: ephys
+  experiment_directory: O09-12_raw
+
+- organoid_id: O11
+  experiment_start_time: "2023-05-18 18:15:00"
+  experiment_end_time: "2023-05-19 09:30:00"
+  drug_name: No Drug
+  drug_concentration:
   experiment_plan: ephys
   experiment_directory: O09-12_raw
 
 - organoid_id: O12
-  experiment_datetime: "2023-05-18"
+  experiment_start_time: "2023-05-18 18:15:00"
+  experiment_end_time: "2023-05-19 09:30:00"
+  drug_name: No Drug
+  drug_concentration:
+  experiment_plan: ephys
+  experiment_directory: O09-12_raw
+
+- organoid_id: O09
+  experiment_start_time: "2023-05-19 09:30:00"
+  experiment_end_time: "2023-05-19 15:35:00"
+  drug_name: Bicuculline
+  drug_concentration: 50
+  experiment_plan: ephys
+  experiment_directory: O09-12_raw
+
+- organoid_id: O10
+  experiment_start_time: "2023-05-19 09:30:00"
+  experiment_end_time: "2023-05-19 15:35:00"
+  drug_name: Bicuculline
+  drug_concentration: 50
+  experiment_plan: ephys
+  experiment_directory: O09-12_raw
+
+- organoid_id: O11
+  experiment_start_time: "2023-05-19 09:30:00"
+  experiment_end_time: "2023-05-19 15:35:00"
+  drug_name: Bicuculline
+  drug_concentration: 50
+  experiment_plan: ephys
+  experiment_directory: O09-12_raw
+
+- organoid_id: O12
+  experiment_start_time: "2023-05-19 09:30:00"
+  experiment_end_time: "2023-05-19 15:35:00"
+  drug_name: Bicuculline
+  drug_concentration: 50
+  experiment_plan: ephys
+  experiment_directory: O09-12_raw
+
+- organoid_id: O09
+  experiment_start_time: "2023-05-19 15:45:00"
+  experiment_end_time: "2023-05-20 15:40:00"
+  drug_name: Tetrodotoxin
+  drug_concentration: 1
+  experiment_plan: ephys
+  experiment_directory: O09-12_raw
+
+- organoid_id: O10
+  experiment_start_time: "2023-05-19 15:45:00"
+  experiment_end_time: "2023-05-20 15:40:00"
+  drug_name: Tetrodotoxin
+  drug_concentration: 1
+  experiment_plan: ephys
+  experiment_directory: O09-12_raw
+
+- organoid_id: O11
+  experiment_start_time: "2023-05-19 15:45:00"
+  experiment_end_time: "2023-05-20 15:40:00"
+  drug_name: Tetrodotoxin
+  drug_concentration: 1
+  experiment_plan: ephys
+  experiment_directory: O09-12_raw
+
+- organoid_id: O12
+  experiment_start_time: "2023-05-19 15:45:00"
+  experiment_end_time: "2023-05-20 15:40:00"
+  drug_name: Tetrodotoxin
+  drug_concentration: 1
   experiment_plan: ephys
   experiment_directory: O09-12_raw
 
 - organoid_id: O13
-  experiment_datetime: "2023-06-08"
+  experiment_start_time: "2023-06-08 19:05:00"
+  experiment_end_time: "2023-06-08 23:35:00"
+  drug_name: 4-AP
+  drug_concentration: 100
   experiment_plan: ephys
   experiment_directory: O13-16_raw
 
 - organoid_id: O14
-  experiment_datetime: "2023-06-08"
+  experiment_start_time: "2023-06-08 19:05:00"
+  experiment_end_time: "2023-06-08 23:35:00"
+  drug_name: 4-AP
+  drug_concentration: 100
   experiment_plan: ephys
   experiment_directory: O13-16_raw
 
 - organoid_id: O15
-  experiment_datetime: "2023-06-08"
+  experiment_start_time: "2023-06-08 19:05:00"
+  experiment_end_time: "2023-06-08 23:35:00"
+  drug_name: 4-AP
+  drug_concentration: 100
   experiment_plan: ephys
   experiment_directory: O13-16_raw
 
 - organoid_id: O16
-  experiment_datetime: "2023-06-08"
+  experiment_start_time: "2023-06-08 19:05:00"
+  experiment_end_time: "2023-06-08 23:35:00"
+  drug_name: 4-AP
+  drug_concentration: 100
+  experiment_plan: ephys
+  experiment_directory: O13-16_raw
+
+- organoid_id: O13
+  experiment_start_time: "2023-06-08 23:35:00"
+  experiment_end_time: "2023-06-09 10:20:00"
+  drug_name: No Drug
+  drug_concentration:
+  experiment_plan: ephys
+  experiment_directory: O13-16_raw
+
+- organoid_id: O14
+  experiment_start_time: "2023-06-08 23:35:00"
+  experiment_end_time: "2023-06-09 10:20:00"
+  drug_name: No Drug
+  drug_concentration:
+  experiment_plan: ephys
+  experiment_directory: O13-16_raw
+
+- organoid_id: O15
+  experiment_start_time: "2023-06-08 23:35:00"
+  experiment_end_time: "2023-06-09 10:20:00"
+  drug_name: No Drug
+  drug_concentration:
+  experiment_plan: ephys
+  experiment_directory: O13-16_raw
+
+- organoid_id: O16
+  experiment_start_time: "2023-06-08 23:35:00"
+  experiment_end_time: "2023-06-09 10:20:00"
+  drug_name: No Drug
+  drug_concentration:
+  experiment_plan: ephys
+  experiment_directory: O13-16_raw
+
+- organoid_id: O13
+  experiment_start_time: "2023-06-09 10:20:00"
+  experiment_end_time: "2023-06-09 15:35:00"
+  drug_name: Bicuculline
+  drug_concentration: 50
+  experiment_plan: ephys
+  experiment_directory: O13-16_raw
+
+- organoid_id: O14
+  experiment_start_time: "2023-06-09 10:20:00"
+  experiment_end_time: "2023-06-09 15:35:00"
+  drug_name: Bicuculline
+  drug_concentration: 50
+  experiment_plan: ephys
+  experiment_directory: O13-16_raw
+
+- organoid_id: O15
+  experiment_start_time: "2023-06-09 10:20:00"
+  experiment_end_time: "2023-06-09 15:35:00"
+  drug_name: Bicuculline
+  drug_concentration: 50
+  experiment_plan: ephys
+  experiment_directory: O13-16_raw
+
+- organoid_id: O16
+  experiment_start_time: "2023-06-09 10:20:00"
+  experiment_end_time: "2023-06-09 15:35:00"
+  drug_name: Bicuculline
+  drug_concentration: 50
+  experiment_plan: ephys
+  experiment_directory: O13-16_raw
+
+- organoid_id: O13
+  experiment_start_time: "2023-06-09 15:40:00"
+  experiment_end_time: "2023-06-10 14:15:00"
+  drug_name: Tetrodotoxin
+  drug_concentration: 1
+  experiment_plan: ephys
+  experiment_directory: O13-16_raw
+
+- organoid_id: O14
+  experiment_start_time: "2023-06-09 15:40:00"
+  experiment_end_time: "2023-06-10 14:15:00"
+  drug_name: Tetrodotoxin
+  drug_concentration: 1
+  experiment_plan: ephys
+  experiment_directory: O13-16_raw
+
+- organoid_id: O15
+  experiment_start_time: "2023-06-09 15:40:00"
+  experiment_end_time: "2023-06-10 14:15:00"
+  drug_name: Tetrodotoxin
+  drug_concentration: 1
+  experiment_plan: ephys
+  experiment_directory: O13-16_raw
+
+- organoid_id: O16
+  experiment_start_time: "2023-06-09 15:40:00"
+  experiment_end_time: "2023-06-10 14:15:00"
+  drug_name: Tetrodotoxin
+  drug_concentration: 1
   experiment_plan: ephys
   experiment_directory: O13-16_raw
 
 - organoid_id: O17
-  experiment_datetime: "2023-07-12"
+  experiment_start_time: "2023-07-12 13:10:00"
+  experiment_end_time: "2023-07-12 16:10:00"
+  drug_name: 4-AP
+  drug_concentration: 100
   experiment_plan: ephys
   experiment_directory: O17-20_raw
 
 - organoid_id: O18
-  experiment_datetime: "2023-07-12"
+  experiment_start_time: "2023-07-12 13:10:00"
+  experiment_end_time: "2023-07-12 16:10:00"
+  drug_name: 4-AP
+  drug_concentration: 100
   experiment_plan: ephys
   experiment_directory: O17-20_raw
 
 - organoid_id: O19
-  experiment_datetime: "2023-07-12"
+  experiment_start_time: "2023-07-12 13:10:00"
+  experiment_end_time: "2023-07-12 16:10:00"
+  drug_name: 4-AP
+  drug_concentration: 100
   experiment_plan: ephys
   experiment_directory: O17-20_raw
 
 - organoid_id: O20
-  experiment_datetime: "2023-07-12"
+  experiment_start_time: "2023-07-12 13:10:00"
+  experiment_end_time: "2023-07-12 16:10:00"
+  drug_name: 4-AP
+  drug_concentration: 100
+  experiment_plan: ephys
+  experiment_directory: O17-20_raw
+
+- organoid_id: O17
+  experiment_start_time: "2023-07-12 16:10:00"
+  experiment_end_time: "2023-07-13 12:35:00"
+  drug_name: No Drug
+  drug_concentration:
+  experiment_plan: ephys
+  experiment_directory: O17-20_raw
+
+- organoid_id: O18
+  experiment_start_time: "2023-07-12 16:10:00"
+  experiment_end_time: "2023-07-13 12:35:00"
+  drug_name: No Drug
+  drug_concentration:
+  experiment_plan: ephys
+  experiment_directory: O17-20_raw
+
+- organoid_id: O19
+  experiment_start_time: "2023-07-12 16:10:00"
+  experiment_end_time: "2023-07-13 12:35:00"
+  drug_name: No Drug
+  drug_concentration:
+  experiment_plan: ephys
+  experiment_directory: O17-20_raw
+
+- organoid_id: O20
+  experiment_start_time: "2023-07-12 16:10:00"
+  experiment_end_time: "2023-07-13 12:35:00"
+  drug_name: No Drug
+  drug_concentration:
+  experiment_plan: ephys
+  experiment_directory: O17-20_raw
+
+- organoid_id: O17
+  experiment_start_time: "2023-07-13 12:35:00"
+  experiment_end_time: "2023-07-13 18:10:00"
+  drug_name: Bicuculline
+  drug_concentration: 50
+  experiment_plan: ephys
+  experiment_directory: O17-20_raw
+
+- organoid_id: O18
+  experiment_start_time: "2023-07-13 12:35:00"
+  experiment_end_time: "2023-07-13 18:10:00"
+  drug_name: Bicuculline
+  drug_concentration: 50
+  experiment_plan: ephys
+  experiment_directory: O17-20_raw
+
+- organoid_id: O19
+  experiment_start_time: "2023-07-13 12:35:00"
+  experiment_end_time: "2023-07-13 18:10:00"
+  drug_name: Bicuculline
+  drug_concentration: 50
+  experiment_plan: ephys
+  experiment_directory: O17-20_raw
+
+- organoid_id: O20
+  experiment_start_time: "2023-07-13 12:35:00"
+  experiment_end_time: "2023-07-13 18:10:00"
+  drug_name: Bicuculline
+  drug_concentration: 50
+  experiment_plan: ephys
+  experiment_directory: O17-20_raw
+
+- organoid_id: O17
+  experiment_start_time: "2023-07-13 18:15:00"
+  experiment_end_time: "2023-07-14 15:45:00"
+  drug_name: Tetrodotoxin
+  drug_concentration: 1
+  experiment_plan: ephys
+  experiment_directory: O17-20_raw
+
+- organoid_id: O18
+  experiment_start_time: "2023-07-13 18:15:00"
+  experiment_end_time: "2023-07-14 15:45:00"
+  drug_name: Tetrodotoxin
+  drug_concentration: 1
+  experiment_plan: ephys
+  experiment_directory: O17-20_raw
+
+- organoid_id: O19
+  experiment_start_time: "2023-07-13 18:15:00"
+  experiment_end_time: "2023-07-14 15:45:00"
+  drug_name: Tetrodotoxin
+  drug_concentration: 1
+  experiment_plan: ephys
+  experiment_directory: O17-20_raw
+
+- organoid_id: O20
+  experiment_start_time: "2023-07-13 18:15:00"
+  experiment_end_time: "2023-07-14 15:45:00"
+  drug_name: Tetrodotoxin
+  drug_concentration: 1
   experiment_plan: ephys
   experiment_directory: O17-20_raw
