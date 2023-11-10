@@ -39,12 +39,10 @@ Get started with the Utah Organoids project by following these steps:
     ```
 1. To generate the `dj_local_config.json` file, execute the command below. Input your username and password when prompted:
     ```bash
-    ./create_dj_config.sh
+    chmod +x ./create_dj_config.sh && ./create_dj_config.sh
     ```
-If you encounter permission denial, use the following command and then execute the previous command again:
-    ```bash
-    chmod +x create_dj_config.sh
-    ```
+
+
 
 ## Uploading Raw Data
 Please follow these steps to upload your raw data files:
