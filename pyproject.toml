@@ -23,8 +23,8 @@ classifiers = [
     "Programming Language :: Python :: 3",
 ]
 dependencies = [
-    "datajoint-utilities @ git+https://github.com/datajoint-company/datajoint-utilities.git",
     "datajoint>=0.13",
+    "datajoint-utilities @ git+https://github.com/datajoint-company/datajoint-utilities.git",
     "djsciops",
     "ecephys-spike-sorting @ git+https://github.com/datajoint/ecephys_spike_sorting.git",
     "element-animal>=0.1.3",

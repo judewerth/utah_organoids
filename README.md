@@ -6,6 +6,14 @@ DataJoint workflow for the Organoids project at the University of Utah.
 
 <img src=./images/culture_diagram.png width="50%">
 
+## Organoids DataJoint Diagram Experiment
+
+<img src=./images/datajoint_diagram_experiment.svg>
+
+## Organoids DataJoint Diagram Ephys Session
+
+<img src=./images/datajoint_diagram_ephys_session.svg>
+
 ## SciViz website
 Data viewer for the Organoids DataJoint pipeline. Please use the entry forms provided on the website to manually input relevant data entries.
 
@@ -29,10 +37,13 @@ Get started with the Utah Organoids project by following these steps:
     ```bash
     pip install -e .
     ```
-1. Run the following to create `dj_local_config.json` file. When prompted, enter your username and password.
+1. To generate the `dj_local_config.json` file, execute the command below. Input your username and password when prompted:
     ```bash
-    ./create_dj_config.sh
+    chmod +x ./create_dj_config.sh && ./create_dj_config.sh
     ```
+
+
+
 ## Uploading Raw Data
 Please follow these steps to upload your raw data files:
 
