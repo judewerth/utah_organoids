@@ -5,7 +5,7 @@ from datajoint_utilities.dj_worker import DataJointWorker, ErrorLog, WorkerLog
 
 from workflow import DB_PREFIX, SUPPORT_DB_PREFIX, WORKER_MAX_IDLED_CYCLE
 from workflow.pipeline import analysis, ephys
-from workflow.support import ingestion_support
+from workflow.utils import ingestion_utils
 
 logger = dj.logger
 
@@ -26,7 +26,7 @@ standard_worker = DataJointWorker(
     autoclear_error_patterns=autoclear_error_patterns,
 )
 
-standard_worker(ingestion_support.FileProcessing)
+standard_worker(ingestion_utils.ingest_ephys_files())
 standard_worker(ephys.EphysSessionInfo, max_calls=5)
 standard_worker(ephys.LFP, max_calls=5)
 standard_worker(analysis.LFPSpectrogram, max_calls=5)
