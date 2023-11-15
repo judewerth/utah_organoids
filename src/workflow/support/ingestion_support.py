@@ -25,9 +25,7 @@ class FileProcessing(dj.Imported):
 
     def make(self, key):
         """
-        For each new file in FileManifest, process the file to attempt to:
-        1. register new entries for ephys.EphysRawFile (from .rhs files)
-        2. attempt to create ephys.EphysSession
+        For each new file in FileManifest, process the file to attempt to register new entries for ephys.EphysRawFile (from .rhs files)
         """
         log_message = ""
         remote_fullpath = Path(key["remote_fullpath"])
@@ -53,17 +51,6 @@ class FileProcessing(dj.Imported):
                     }
                 )
                 log_message += f"Added new raw ephys: {remote_fullpath.name}" + "\n"
-            elif remote_fullpath.name == "upload_completed.txt":
-                file_count = len(
-                    FileManifest
-                    & f'remote_fullpath LIKE "{parent_dir.as_posix()}%.rhs"'
-                )
-                if (
-                    len(ephys.EphysRawFile & {"parent_folder": parent_dir.name})
-                    < file_count
-                ):
-                    return
-
         self.insert1(
             {**key, "execution_time": datetime.utcnow(), "log_message": log_message}
         )
