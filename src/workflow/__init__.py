@@ -32,17 +32,6 @@ ORG_NAME, WORKFLOW_NAME, *_ = DB_PREFIX.split("_")
 SUPPORT_DB_PREFIX = f"{ORG_NAME}_support_{WORKFLOW_NAME}_"
 REL_PATH_INBOX = f"{ORG_NAME}_{WORKFLOW_NAME}/inbox"
 REL_PATH_OUTBOX = f"{ORG_NAME}_{WORKFLOW_NAME}/outbox"
-S3_STORE = dict(
-    protocol="s3",
-    bucket="dj-sciops",
-    endpoint="s3.amazonaws.com:9000",
-    access_key=os.getenv("AWS_ACCESS_KEY", None),
-    secret_key=os.getenv("AWS_ACCESS_SECRET", None),
-    location=f"{ORG_NAME}_{WORKFLOW_NAME}_",
-    stage=dj.config["custom"]["raw_root_data_dir"],
-    subfolding=(2, 2),
-)
-
 WORKER_MAX_IDLED_CYCLE = int(
     os.getenv(
         "WORKER_MAX_IDLED_CYCLE", dj.config["custom"].get("worker_max_idled_cycle", 3)
