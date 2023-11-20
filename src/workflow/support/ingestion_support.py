@@ -33,7 +33,7 @@ class FileProcessing(dj.Imported):
             parent_dir = remote_fullpath.parent
             if remote_fullpath.suffix in [".rhd", ".rhs"]:
                 filename_prefix, start_time = re.search(
-                    r"(.*)_(\d{6}_\d{6})", remote_fullpath
+                    r"(.*)_(\d{6}_\d{6})", remote_fullpath.as_posix()
                 ).groups()
                 start_time = np.datetime64(
                     datetime.strptime(start_time, "%y%m%d_%H%M%S")
