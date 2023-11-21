@@ -19,7 +19,7 @@ autoclear_error_patterns = []
 standard_worker = DataJointWorker(
     "standard_worker",
     worker_schema_name=f"{SUPPORT_DB_PREFIX}workerlog",
-    DB_PREFIX=[DB_PREFIX, SUPPORT_DB_PREFIX],
+    db_prefix=[DB_PREFIX, SUPPORT_DB_PREFIX],
     run_duration=-1,
     max_idled_cycle=WORKER_MAX_IDLED_CYCLE,
     sleep_duration=30,
