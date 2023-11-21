@@ -1,5 +1,13 @@
 # Changelog
 
+## `v0.4.3`
+
+
+### Bug Fixes
+
+* :bug: fix f string error in exception ([e058114](https://github.com/dj-sciops/utah_organoids/commit/e05811493c4cbef643df5ec7d4079ee81e6d70fa))
+
+
 ## `v0.4.2`
 
 
