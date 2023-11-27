@@ -20,14 +20,12 @@ class FileProcessing(dj.Imported):
     -> FileManifest
     ---
     execution_time: datetime  # UTC time
-    log_message='': varchar(1000)
     """
 
     def make(self, key):
         """
-        For each new file in FileManifest, process the file to attempt to register new entries for ephys.EphysRawFile (from .rhs files)
+        For each new file in FileManifest, process the file to attempt to register new entries for ephys.EphysRawFile.
         """
-        log_message = ""
         remote_fullpath = Path(key["remote_fullpath"])
         if Path(REL_PATH_INBOX) in remote_fullpath.parents:
             parent_dir = remote_fullpath.parent
@@ -50,7 +48,4 @@ class FileProcessing(dj.Imported):
                         "file": (FileManifest & key).fetch1("file"),
                     }
                 )
-                log_message += f"Added new raw ephys: {remote_fullpath.name}" + "\n"
-        self.insert1(
-            {**key, "execution_time": datetime.utcnow(), "log_message": log_message}
-        )
+        self.insert1({**key, "execution_time": datetime.utcnow()})
