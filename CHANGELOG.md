@@ -1,5 +1,19 @@
 # Changelog
 
+## `v0.5.0`
+
+
+### Features
+
+* :sparkles: add session_type to create_sessions ([969d993](https://github.com/dj-sciops/utah_organoids/commit/969d99313bb7159474bd190eabe575d031b5f12f))
+* :sparkles: resolve duplicate file download issue ([ee5c8cd](https://github.com/dj-sciops/utah_organoids/commit/ee5c8cdab032e26992b97a7f5c07d5dc099aa522))
+
+
+### Code Refactoring
+
+* :fire: remove log_message from FileProcessing ([b594221](https://github.com/dj-sciops/utah_organoids/commit/b594221471aac429718cc879b6ec1ce156d65065))
+
+
 ## `v0.4.3`
 
 
