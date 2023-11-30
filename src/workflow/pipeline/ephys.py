@@ -14,15 +14,6 @@ from workflow.utils.paths import (
 )
 
 # Set s3 stores configuration
-data_root = dict(
-    protocol="s3",
-    endpoint="s3.amazonaws.com:9000",
-    bucket="dj-sciops",
-    location=f"{ORG_NAME}_{WORKFLOW_NAME}",
-    access_key=os.getenv("AWS_ACCESS_KEY", None),
-    secret_key=os.getenv("AWS_ACCESS_SECRET", None),
-    stage=get_processed_root_data_dir().parent,
-)
 datajoint_blob = dict(
     protocol="s3",
     endpoint="s3.amazonaws.com:9000",
@@ -33,7 +24,6 @@ datajoint_blob = dict(
 )
 
 stores: dict[str, Any] = dj.config.get("stores", {})
-stores.setdefault("data-root", data_root)
 stores.setdefault("datajoint-blob", datajoint_blob)
 dj.config["stores"] = stores
 

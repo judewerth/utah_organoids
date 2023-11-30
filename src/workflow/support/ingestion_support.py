@@ -1,5 +1,5 @@
 import re
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 
 import datajoint as dj
@@ -38,14 +38,15 @@ class FileProcessing(dj.Imported):
                 )  # start time based on the file name
                 ephys.EphysRawFile.insert1(
                     {
-                        "file_path": remote_fullpath.as_posix(),
+                        "file_path": remote_fullpath.relative_to(
+                            REL_PATH_INBOX
+                        ).as_posix(),
                         "acq_software": {".rhd": "Intan", ".rhs": "Intan"}[
                             remote_fullpath.suffix
                         ],
                         "file_time": start_time,
                         "parent_folder": parent_dir.name,
                         "filename_prefix": filename_prefix,
-                        "file": (FileManifest & key).fetch1("file"),
                     }
                 )
         self.insert1({**key, "execution_time": datetime.utcnow()})

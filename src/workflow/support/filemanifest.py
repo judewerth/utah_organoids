@@ -10,16 +10,17 @@ __all__ = ["FileManifest"]
 # ------------- Configure the "support-pipeline" -------------
 org_vm = dj.create_virtual_module("org_vm", f"{ORG_NAME}_admin_workflow")
 
-dj.config["stores"] = {
-    "data-root": dict(
-        protocol="s3",
-        endpoint="s3.amazonaws.com:9000",
-        bucket="dj-sciops",
-        location=f"{ORG_NAME}_{WORKFLOW_NAME}",
-        access_key=os.getenv("AWS_ACCESS_KEY", None),
-        secret_key=os.getenv("AWS_ACCESS_SECRET", None),
-        stage=get_processed_root_data_dir().parent,
-    ),
-}
+stores = dj.config.get("stores", {})
+stores["data-root"] = dict(
+    protocol="s3",
+    endpoint="s3.amazonaws.com:9000",
+    bucket="dj-sciops",
+    location=f"{ORG_NAME}_{WORKFLOW_NAME}",
+    access_key=os.getenv("AWS_ACCESS_KEY", None),
+    secret_key=os.getenv("AWS_ACCESS_SECRET", None),
+    stage=get_processed_root_data_dir().parent,
+)
+
+dj.config["stores"] = stores
 
 FileManifest = org_vm.FileManifest
