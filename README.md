@@ -19,6 +19,15 @@ Data viewer for the Organoids DataJoint pipeline. Please use the entry forms pro
 
 https://organoids.datajoint.com/
 
+## DataJoint Codebook (JupyterHub)
+
+*Online coding environment*
+
+https://sciops-codebook.datajoint.com/hub/spawn
+
++ Use your DataJoint Works credentials.
++ Select the "Utah - Organoids" server, then press "Start".
+
 ## Initial Configuration Instructions
 
 Get started with the Utah Organoids project by following these steps:
@@ -41,7 +50,6 @@ Get started with the Utah Organoids project by following these steps:
     ```bash
     chmod +x ./create_dj_config.sh && ./create_dj_config.sh
     ```
-
 
 
 ## Uploading Raw Data
