@@ -19,6 +19,16 @@ Data viewer for the Organoids DataJoint pipeline. Please use the entry forms pro
 
 https://organoids.datajoint.com/
 
+## DataJoint Codebook for Organoids (JupyterHub)
+
+*Online coding environment*
+
+https://sciops-codebook.datajoint.com/
+
++ Use your DataJoint Works credentials.
++ Select the "Utah - Organoids" server, then press "Start".
++ Please make sure to halt the server and log out if you access the codebook on a different day: `File/Hub Control Panel/ Stop My Server` and `Logout`.
+
 ## Initial Configuration Instructions
 
 Get started with the Utah Organoids project by following these steps:
@@ -37,11 +47,13 @@ Get started with the Utah Organoids project by following these steps:
     ```bash
     pip install -e .
     ```
-1. To generate the `dj_local_config.json` file, execute the command below. Input your username and password when prompted:
+1. To create the `dj_local_conf.json` file, execute the command below. Input your username and password when prompted:
     ```bash
     chmod +x ./create_dj_config.sh && ./create_dj_config.sh
     ```
-
+1. Insert the AWS functional user credentials to fetch data from the s3 bucket to the notebook:
+    + By inserting the credentials in the `dj_local_conf.json` file
+    + By creating a `.env` file containing these credentials as environment variables
 
 
 ## Uploading Raw Data
