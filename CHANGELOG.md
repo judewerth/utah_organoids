@@ -1,5 +1,19 @@
 # Changelog
 
+## `v0.6.0`
+
+
+### Features
+
+* :sparkles: add auto_insert_sessions to ingestion_utils.py ([e2d2a2c](https://github.com/dj-sciops/utah_organoids/commit/e2d2a2c0ff117f49e36a6e2708d709d3af817ef7))
+* :sparkles: add get_workflow_operation_overview ([d088afc](https://github.com/dj-sciops/utah_organoids/commit/d088afc7db85b891b47442f887fb3866eee0f683))
+
+
+### Code Refactoring
+
+* :sparkles: move example usage of create_session to ingestion_utils.py ([b7e4875](https://github.com/dj-sciops/utah_organoids/commit/b7e4875d8b48a6c070d16e26768b09d4c852c371))
+
+
 
 ## `v0.5.1`
 
