@@ -47,7 +47,6 @@ services:
               count: 1
               capabilities: [ gpu ]
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
       - ${OUTBOX_MOUNTPOINT}:/home/${CONTAINER_USER}/efs/outbox
       - ${S3_ROOT_MOUNTPOINT}:/home/${CONTAINER_USER}/s3
     scale: ${WORKER_COUNT:-1}
