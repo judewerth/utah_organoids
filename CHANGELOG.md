@@ -1,5 +1,18 @@
 # Changelog
 
+## `v0.6.1`
+
+
+### Bug Fixes
+
+* :bug: bug fix in spike_sorting.ipynb ([24ce9b3](https://github.com/dj-sciops/utah_organoids/commit/24ce9b367ea43c89edb35e355bcb8968aa892e65))
+
+
+### Styles
+
+* format fix ([81dad78](https://github.com/dj-sciops/utah_organoids/commit/81dad7846a360c408475c17d4389cd4f4a8c724c))
+
+
 ## `v0.6.0`
 
 
