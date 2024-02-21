@@ -31,7 +31,7 @@ class InductionCulture(dj.Manual):
 
 
 @schema
-class StemCells(dj.Manual):
+class StemCell(dj.Manual):
     definition = """
     -> InductionCulture
     stem_cell_condition_datetime: datetime
