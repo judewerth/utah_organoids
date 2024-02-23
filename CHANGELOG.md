@@ -5,6 +5,20 @@
 
 ### Features
 
+* **specs:** add StemCell route, table, and form ([567e643](https://github.com/dj-sciops/utah_organoids/commit/567e643df63d311f7d34d73d093dc04a64fe9e0b))
+
+
+### Bug Fixes
+
+* fix error by adding  ([d8d24b4](https://github.com/dj-sciops/utah_organoids/commit/d8d24b49c2ee7cd27584aa4d85b4380638cc95cc))
+* update versions of fakeservices.datajoint.io and pharus ([ba89edd](https://github.com/dj-sciops/utah_organoids/commit/ba89eddfe1f22c87ed19c61a8a0713f0c6a8e722))
+
+
+## `v0.7.0`
+
+
+### Features
+
 * :feat(culture): Add `StemCell` table to accommodate an alternative experimental protocol 
 * :update(README): Add section for local testing of SciViz, and section for resources and notebook
 * :fix(webapps): Add platform and update version of `pharus` and `fakeservices.datajoint.io` in `docker-compose.yaml`
