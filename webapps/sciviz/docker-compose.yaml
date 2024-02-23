@@ -6,7 +6,7 @@ services:
   pharus: 
     cpus: 0.50
     mem_limit: 512m
-    image: datajoint/pharus:0.8.5
+    image: datajoint/pharus:0.8.6
     environment:
       PHARUS_SPEC_PATH: /main/specs/utah_organoids_specsheet.yaml
       PHARUS_MODE: DEV  # DEV | PROD
@@ -40,7 +40,7 @@ services:
     networks:
       - main
   fakeservices.datajoint.io:
-    image: datajoint/nginx:v0.2.4
+    image: datajoint/nginx:v0.2.6
     environment:
       - ADD_pharus_TYPE=REST
       - ADD_pharus_ENDPOINT=pharus:5000
