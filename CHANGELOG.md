@@ -1,5 +1,16 @@
 # Changelog
 
+## `v0.7.0`
+
+
+### Features
+
+* :feat(culture): Add `StemCell` table to accommodate an alternative experimental protocol 
+* :update(README): Add section for local testing of SciViz, and section for resources and notebook
+* :fix(webapps): Add platform and update version of `pharus` and `fakeservices.datajoint.io` in `docker-compose.yaml`
+* :feat(webapps): Add route, table and form for new table `StemCell` in `utah_organoids_specsheet.yaml`
+
+
 ## `v0.6.1`
 
 
