@@ -25,8 +25,8 @@ services:
       - AWS_ACCESS_SECRET
       - AWSACCESSKEYID=${AWS_ACCESS_KEY}
       - AWSSECRETACCESSKEY=${AWS_ACCESS_SECRET}
-      - RAW_ROOT_DATA_DIR=/home/${CONTAINER_USER}/s3/inbox
-      - PROCESSED_ROOT_DATA_DIR=/home/${CONTAINER_USER}/efs/outbox
+      - RAW_ROOT_DATA_DIR=${S3_ROOT_MOUNTPOINT}/inbox
+      - PROCESSED_ROOT_DATA_DIR=${OUTBOX_MOUNTPOINT}
       - WORKER_MAX_IDLED_CYCLE
       - BUCKET_NAME
       - REPO_NAME
@@ -37,8 +37,8 @@ services:
     security_opt:
       - apparmor:unconfined
     volumes:
-      - ${OUTBOX_MOUNTPOINT}:/home/${CONTAINER_USER}/efs/outbox
-      - ${S3_ROOT_MOUNTPOINT}:/home/${CONTAINER_USER}/s3
+      - ${OUTBOX_MOUNTPOINT}:${OUTBOX_MOUNTPOINT}
+      - ${S3_ROOT_MOUNTPOINT}:${S3_ROOT_MOUNTPOINT}
     scale: ${WORKER_COUNT:-1}
     command:
       - /bin/bash
