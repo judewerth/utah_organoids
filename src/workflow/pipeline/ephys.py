@@ -4,6 +4,7 @@ from typing import Any
 import datajoint as dj
 from element_array_ephys import ephys_organoids as ephys
 from element_array_ephys import ephys_report, probe
+from element_array_ephys.spike_sorting import si_spike_sorting as ephys_sorter
 
 from workflow import DB_PREFIX, ORG_NAME, WORKFLOW_NAME
 from workflow.pipeline import culture
@@ -30,5 +31,9 @@ dj.config["stores"] = stores
 
 if not ephys.schema.is_activated():
     ephys.activate(DB_PREFIX + "ephys", DB_PREFIX + "probe", linking_module=__name__)
+    ephys_sorter.activate(DB_PREFIX + "ephys_sorter", ephys_module=ephys)
 
-__all__ = ["ephys", "probe"]
+# Modify key_source
+ephys.Clustering.key_source = (
+    ephys.Clustering.key_source - ephys_sorter.PreProcessing.key_source
+).proj() + ephys_sorter.PostProcessing.proj()
