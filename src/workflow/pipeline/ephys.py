@@ -49,19 +49,31 @@ params["SI_SORTING_PARAMS"] = {
         "max_spikes_per_unit": 200,
         "overwrite": True,
         "sparse": True,
-        "method": "ptp",
-        "threshold": 1,
+        "method": "energy",
+        "threshold": 0.25,
     },
     "filtering": {"freq_min": 150, "dtype": "float32"},
-    "detection": {"peak_sign": "neg", "detect_threshold": 5},
-    "selection": {"n_peaks_per_channel": 5000, "min_n_peaks": 20000},
-    "localization": {},
-    "clustering": {},
-    "matching": {},
+    "detection": {"peak_sign": "neg", "detect_threshold": 4},
+    "selection": {
+        "method": "smart_sampling_amplitudes",
+        "n_peaks_per_channel": 5000,
+        "min_n_peaks": 20000,
+        "select_per_channel": False,
+    },
+    "clustering": {"legacy": False},
+    "matching": {"method": "circus-omp-svd", "method_kwargs": {}},
     "apply_preprocessing": True,
     "shared_memory": True,
-    "job_kwargs": {"n_jobs": -1},
+    "cache_preprocessing": {
+        "mode": "memory",
+        "memory_limit": 0.5,
+        "delete_cache": True,
+    },
+    "multi_units_only": False,
+    "job_kwargs": {"n_jobs": 0.8},
+    "debug": False,
 }
+
 
 params["SI_PREPROCESSING_METHOD"] = "organoid_preprocessing"
 params["SI_WAVEFORM_EXTRACTION_PARAMS"] = {
