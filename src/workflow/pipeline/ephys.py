@@ -9,6 +9,7 @@ from element_array_ephys.spike_sorting import si_spike_sorting as ephys_sorter
 
 from workflow import DB_PREFIX, ORG_NAME, WORKFLOW_NAME
 from workflow.pipeline import culture
+from workflow.utils import download_results
 from workflow.utils.paths import (
     get_ephys_root_data_dir,
     get_organoid_directory,
