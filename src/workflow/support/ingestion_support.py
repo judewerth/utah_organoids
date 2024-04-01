@@ -59,7 +59,7 @@ class FileProcessing(dj.Imported):
 
 
 @schema
-class PostCalciumImaging(dj.Imported):
+class PostEphys(dj.Imported):
     definition = """ 
     -> ephys.WaveformSet
     ---
@@ -68,7 +68,6 @@ class PostCalciumImaging(dj.Imported):
 
     @property
     def key_source(self):
-        # entries in Fluorescence that has Activity populated completely
         return ephys.WaveformSet & ephys.QualityMetrics
 
     def make(self, key):
