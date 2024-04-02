@@ -29,6 +29,7 @@ def _get_axon_s3_session():
         aws_account_id=dj_sciops_config["aws"]["account_id"],
         s3_role=dj_sciops_config["s3"]["role"],
         auth_client_id=dj_sciops_config["djauth"]["client_id"],
+        auth_client_secret=dj_sciops_config["djauth"].get("client_secret"),
     )
     s3_bucket = dj_sciops_config["s3"]["bucket"]
     return s3_session, s3_bucket

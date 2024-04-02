@@ -81,6 +81,8 @@ def _move_files(output_relpath):
     local_outbox = get_processed_root_data_dir()
     remote_outbox = Path(get_raw_root_data_dir()).parent / "outbox"
 
+    assert local_outbox != remote_outbox, "Local and remote outbox cannot be the same"
+
     local_output_dir = find_full_path(local_outbox, output_relpath)
     file_count = len([f for f in local_output_dir.rglob("*") if f.is_file()])
 
