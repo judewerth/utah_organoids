@@ -1,5 +1,15 @@
 # Changelog
 
+## `v0.9.1`
+
+
+### Bug Fixes
+
+* fix comment ([dc56f65](https://github.com/dj-sciops/utah_organoids/commit/dc56f65d1096366b13d7e7863714a88e92baaae7))
+* update table name ([d9586bb](https://github.com/dj-sciops/utah_organoids/commit/d9586bb8abf8d0a5518c8c5fa89c9330bcbcd625))
+* **process:** update workers ([fd827d2](https://github.com/dj-sciops/utah_organoids/commit/fd827d2e1495c354a369d3f6534595317fd2d53c))
+
+
 ## `v0.9.0`
 
 
