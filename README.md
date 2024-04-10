@@ -70,7 +70,7 @@ Get started with the Utah Organoids project by following these steps:
     ```
 4. Create conda virtual environment
     ```bash
-    conda env create -f env.yml --force && conda activate utah_organoids
+    conda env create -f conda_env.yml --force && conda activate utah_organoids
     ```
 5. Install dependencies
     ```bash
