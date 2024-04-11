@@ -98,7 +98,7 @@ def upload_session_data(session_dir_relpath):
         )
 
 
-def _download_results(relative_dir: str):
+def download_directory(relative_dir: str, dir_type: str = "outbox"):
     """Download data from S3 to local outbox.
 
     Args:
@@ -108,13 +108,17 @@ def _download_results(relative_dir: str):
 
     s3_session, s3_bucket = _get_axon_s3_session()
 
-    remote_dir = Path(REL_PATH_OUTBOX) / relative_dir
-    local_dir = get_processed_root_data_dir() / relative_dir
+    if dir_type == "inbox":
+        local_dir = get_raw_root_data_dir() / relative_dir
+    elif dir_type == "outbox":
+        local_dir = get_processed_root_data_dir() / relative_dir
+    else:
+        raise ValueError(f"Invalid dir_type: {dir_type}")
 
     dj_axon.download_files(
         session=s3_session,
         s3_bucket=s3_bucket,
-        source=remote_dir.as_posix(),
+        source=f"{DB_PREFIX[:-1]}/{dir_type}/{relative_dir}/",
         destination=f'{local_dir}{os.sep}',
     )
     return local_dir
@@ -133,4 +137,4 @@ def download_spike_sorted_results(clustering_key):
 
     output_relpath = (ephys.ClusteringTask & clustering_key).fetch1("clustering_output_dir")
 
-    return _download_results(output_relpath)
+    return download_directory(output_relpath)
