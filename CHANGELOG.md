@@ -1,5 +1,14 @@
 # Changelog
 
+## `v0.11.0`
+
+
+### Features
+
+* add function  ([3261883](https://github.com/dj-sciops/utah_organoids/commit/3261883c70d3ca6ee3f971ecdea3883066c20758))
+* **download:** allow downloading full dir ([1a00631](https://github.com/dj-sciops/utah_organoids/commit/1a006314f7335cdbcbb77edd8eb81de0719e16d2))
+
+
 ## `v0.10.0`
 
 
