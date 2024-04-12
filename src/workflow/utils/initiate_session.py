@@ -2,7 +2,7 @@ import os
 import datajoint as dj
 from pathlib import Path
 
-from workflow import REL_PATH_OUTBOX, DB_PREFIX
+from workflow import DB_PREFIX
 from workflow.utils.paths import get_raw_root_data_dir, get_processed_root_data_dir
 
 logger = dj.logger
