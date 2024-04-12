@@ -1,5 +1,13 @@
 # Changelog
 
+## `v0.12.0`
+
+
+### Features
+
+* more flexible S3 download ([57edb66](https://github.com/dj-sciops/utah_organoids/commit/57edb66254116636efbe5f9b760d06a3c9475e02))
+
+
 ## `v0.11.0`
 
 
