@@ -128,8 +128,8 @@ def download_directory(relative_dir: str, dir_type: str = "outbox"):
     dj_axon.download_files(
         session=s3_session,
         s3_bucket=s3_bucket,
-        source=f"{source}/",
-        destination=f'{local_dir}{os.sep}',
+        source=f"{source.as_posix()}/",
+        destination=f"{local_dir}{os.sep}",
     )
     return local_dir
 
