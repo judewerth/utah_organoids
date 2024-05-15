@@ -4,7 +4,6 @@ from typing import Any
 import datajoint as dj
 from element_array_ephys import ephys_organoids as ephys
 from element_array_ephys import ephys_report, probe
-from element_array_ephys.spike_sorting import si_preprocessing as ephys_preprocessing
 from element_array_ephys.spike_sorting import si_spike_sorting as ephys_sorter
 
 from workflow import DB_PREFIX, ORG_NAME, WORKFLOW_NAME
@@ -14,6 +13,8 @@ from workflow.utils.paths import (
     get_organoid_directory,
     get_processed_root_data_dir,
 )
+
+__all__ = ["probe", "ephys", "ephys_report", "ephys_sorter"]
 
 # Set s3 stores configuration
 datajoint_blob = dict(

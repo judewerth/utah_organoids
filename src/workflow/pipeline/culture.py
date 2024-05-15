@@ -25,7 +25,7 @@ class InductionCulture(dj.Manual):
     induction_culture_plate: int unsigned
     ---
     induction_culture_wells: varchar(8)    # Ranges of wells occupied (e.g. 1-3)
-    culture_plate_type=null: enum('rosette array plate', 'traditional plate')
+    culture_plate_type='': enum('','rosette array plate', 'traditional plate')
     induction_culture_note='': varchar(256)
     """
 
@@ -40,10 +40,10 @@ class StemCell(dj.Manual):
     -> [nullable] User
     density=null: int unsigned # Units of percentage
     quality='': varchar(32) # e.g. cell detach, cell death, color change, morphology change
-    supplement=null: enum('','FGF disc 10ng/mL','FGF disc 20ng/mL', 'Penicillin-Streptomycin','Dorsomorphin 10ng/mL + SB431542 4ng/mL', 'Dorsomorphin 10ng/mL', 'SB431542 4ng/mL') # Supplement, concentration, and units
-    media=null: enum('','N2B27', 'E8/Stem Flex', 'mTeSR')
+    supplement='': enum('','FGF disc 10ng/mL','FGF disc 20ng/mL', 'Penicillin-Streptomycin','Dorsomorphin 10ng/mL + SB431542 4ng/mL', 'Dorsomorphin 10ng/mL', 'SB431542 4ng/mL') # Supplement, concentration, and units
+    media='': enum('','N2B27', 'E8/Stem Flex', 'mTeSR')
     media_percent_changed=null: int unsigned # Percent of the media changed, 1-100
-    substrate=null: enum('','matrigel')
+    substrate='': enum('','matrigel')
     stem_cell_condition_image_directory='': varchar(256) # Images stored with "id_datetime" naming convention.
     genomic_dna=null: bool # Was genomic DNA collected?
     stem_cell_condition_note='': varchar(256)
@@ -61,10 +61,10 @@ class InductionCultureCondition(dj.Manual):
     -> [nullable] User
     density=null: int unsigned # Units of percentage
     quality='': varchar(32) # e.g. cell detach, cell death, color change, morphology change
-    supplement=null: enum('','DMSO 0.1%','Dorsomorphin 10ng/mL + SB431542 4ng/mL', 'Dorsomorphin 10ng/mL', 'SB431542 4ng/mL') # Supplement, concentration, and units
-    media=null: enum('','E6','N2B27')
+    supplement='': enum('','DMSO 0.1%%','Dorsomorphin 10ng/mL + SB431542 4ng/mL', 'Dorsomorphin 10ng/mL', 'SB431542 4ng/mL') # Supplement, concentration, and units
+    media='': enum('','E6','N2B27')
     media_percent_changed=null: int unsigned # Percent of the media changed, 1-100
-    substrate=null: enum('','matrigel')
+    substrate='': enum('','matrigel')
     induction_condition_image_directory='': varchar(256) # Images stored with "id_datetime" naming convention.
     genomic_dna=null: bool # Was genomic DNA collected?
     induction_condition_note='': varchar(256)
@@ -93,10 +93,10 @@ class PostInductionCultureCondition(dj.Manual):
     -> [nullable] User
     density=null: int unsigned               # units of percentage
     quality='': varchar(32) # e.g. cell detach, cell death, color change, morphology change
-    supplement=null: enum('', 'EGF+FGF 10 ng/mL', 'EGF', 'FGF') # Supplement, concentration, and units
-    media=null: enum('', 'N2B27')
+    supplement='': enum('', 'EGF+FGF 10 ng/mL', 'EGF', 'FGF') # Supplement, concentration, and units
+    media='': enum('', 'N2B27')
     media_percent_changed=null: int unsigned  # Percent of the media changed, 1-100
-    substrate=null: enum('', 'matrigel')
+    substrate='': enum('', 'matrigel')
     post_induction_condition_image_directory='': varchar(256) # Images stored with "id_datetime" naming convention.
     post_induction_condition_note='': varchar(256)
     discontinued=null: bool
@@ -125,10 +125,10 @@ class IsolatedRosetteCultureCondition(dj.Manual):
     ---
     -> [nullable] User
     quality='': varchar(32) # e.g. cell detach, cell death, color change, morphology change
-    supplement=null: enum('', 'EGF+FGF 10 ng/mL', 'EGF', 'FGF') # Supplement, concentration, and units
-    media=null: enum('', 'N2B27')
+    supplement='': enum('', 'EGF+FGF 10 ng/mL', 'EGF', 'FGF') # Supplement, concentration, and units
+    media='': enum('', 'N2B27')
     media_percent_changed=null: int unsigned  # Percent of the media changed, 1-100
-    substrate=null: enum('', 'matrigel')
+    substrate='': enum('', 'matrigel')
     isolated_rosette_condition_image_directory='': varchar(256) # Images stored with "id_datetime" naming convention.
     isolated_rosette_condition_note='': varchar(256)
     """
@@ -156,7 +156,7 @@ class OrganoidCultureCondition(dj.Manual):
     supplement='': varchar(32)
     media='': varchar(32)
     media_percent_changed=null: int unsigned # Percent of the media changed, 1-100
-    substrate=null: enum('matrigel')
+    substrate='': enum('', 'matrigel')
     organoid_condition_image_directory='': varchar(256) # Images stored with "id_datetime" naming convention.
     organoid_condition_note='': varchar(256)
     """
@@ -167,7 +167,7 @@ class Drug(dj.Lookup):
     definition = """  # Drug treated on the organoid culture
     drug_name       : varchar(24)
     ---
-    drug_type=null  : varchar(64)
+    drug_type=''    : varchar(64)
     """
     contents = [
         ("No Drug", None),

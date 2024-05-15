@@ -1,5 +1,78 @@
 # Changelog
 
+## `v0.12.1`
+
+
+### Bug Fixes
+
+* **download:** minor path fix ([e293890](https://github.com/dj-sciops/utah_organoids/commit/e2938904f842debcf1c3a06e5f372e4d47eb32c2))
+
+
+## `v0.12.0`
+
+
+### Features
+
+* more flexible S3 download ([57edb66](https://github.com/dj-sciops/utah_organoids/commit/57edb66254116636efbe5f9b760d06a3c9475e02))
+
+
+## `v0.11.0`
+
+
+### Features
+
+* add function  ([3261883](https://github.com/dj-sciops/utah_organoids/commit/3261883c70d3ca6ee3f971ecdea3883066c20758))
+* **download:** allow downloading full dir ([1a00631](https://github.com/dj-sciops/utah_organoids/commit/1a006314f7335cdbcbb77edd8eb81de0719e16d2))
+
+
+## `v0.10.0`
+
+
+### Features
+
+* **worker:** add  to standard_worker ([d1d53e2](https://github.com/dj-sciops/utah_organoids/commit/d1d53e28c99a88cdfc13f22be94d2637e8ec0ad1))
+
+
+## `v0.9.3`
+
+
+### Bug Fixes
+
+* **worker:** minor bugfix ([cfac0e0](https://github.com/dj-sciops/utah_organoids/commit/cfac0e08422de2d8ad20aea33a7e9453eb75ccba))
+
+
+## `v0.9.2`
+
+
+### Bug Fixes
+
+* **session_upload:** allow using client_secret ([fc94351](https://github.com/dj-sciops/utah_organoids/commit/fc943510d5859c9cd6be549920376a3716399529))
+
+
+## `v0.9.1`
+
+
+### Bug Fixes
+
+* fix comment ([dc56f65](https://github.com/dj-sciops/utah_organoids/commit/dc56f65d1096366b13d7e7863714a88e92baaae7))
+* update table name ([d9586bb](https://github.com/dj-sciops/utah_organoids/commit/d9586bb8abf8d0a5518c8c5fa89c9330bcbcd625))
+* **process:** update workers ([fd827d2](https://github.com/dj-sciops/utah_organoids/commit/fd827d2e1495c354a369d3f6534595317fd2d53c))
+
+
+## `v0.9.0`
+
+
+### Features
+
+* :sparkles: add download_results function ([cb99a14](https://github.com/dj-sciops/utah_organoids/commit/cb99a1428f6681884813f0be00036759f84d2764))
+
+
+### Build Systems
+
+* :construction_worker: update standard worker docker ([2c9614e](https://github.com/dj-sciops/utah_organoids/commit/2c9614e938339ef97ea15216d17702776922c6ce))
+* :heavy_plus_sign: add nbformat package ([06b1188](https://github.com/dj-sciops/utah_organoids/commit/06b118826e8f49e122f81f15a3ba198e5bed9450))
+
+
 ## `v0.8.1`
 
 
