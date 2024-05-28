@@ -32,3 +32,5 @@ ARG REPO_BRANCH
 RUN git clone -b ${REPO_BRANCH} git@github.com:${REPO_OWNER}/${REPO_NAME}.git && \
    pip install --upgrade pip && \
    pip install ./${REPO_NAME}
+
+RUN pip install "spikeinterface[full] @ git+https://github.com/SpikeInterface/spikeinterface.git" docker

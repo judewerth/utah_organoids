@@ -35,15 +35,11 @@ if not ephys.schema.is_activated():
     ephys.activate(DB_PREFIX + "ephys", DB_PREFIX + "probe", linking_module=__name__)
     ephys_sorter.activate(DB_PREFIX + "ephys_sorter", ephys_module=ephys)
 
-# Modify key_source
-ephys.Clustering.key_source = (
-    ephys.Clustering.key_source - ephys_sorter.PreProcessing.key_source
-).proj() + ephys_sorter.PostProcessing.proj()
-
 
 # Insert into ClusteringParamSet
 # si.sorters.get_default_sorter_params('kilosort2_5') # api for getting default sorting parameters
 params = {}
+params["SI_PREPROCESSING_METHOD"] = "organoid_preprocessing"
 params["SI_SORTING_PARAMS"] = {
     "general": {"ms_before": 2, "ms_after": 2, "radius_um": 100},
     "waveforms": {
@@ -74,20 +70,31 @@ params["SI_SORTING_PARAMS"] = {
     "job_kwargs": {"n_jobs": 0.8},
     "debug": False,
 }
-
-
-params["SI_PREPROCESSING_METHOD"] = "organoid_preprocessing"
-params["SI_WAVEFORM_EXTRACTION_PARAMS"] = {
-    "ms_before": 1.0,
-    "ms_after": 2.0,
-    "max_spikes_per_unit": 500,
+params["SI_POSTPROCESSING_PARAMS"] = {
+    "extensions": {
+        "random_spikes": {},
+        "waveforms": {},
+        "templates": {},
+        "noise_levels": {},
+        # "amplitude_scalings": {},
+        "correlograms": {},
+        "isi_histograms": {},
+        "principal_components": {"n_components": 5, "mode": "by_channel_local"},
+        "spike_amplitudes": {},
+        "spike_locations": {},
+        "template_metrics": {"include_multi_channel_metrics": True},
+        "template_similarity": {},
+        "unit_locations": {},
+        "quality_metrics": {},
+    },
+    "job_kwargs": {"n_jobs": -1, "chunk_duration": "1s"},
+    "export_to_phy": True,
+    "export_report": True,
 }
-params["SI_QUALITY_METRICS_PARAMS"] = {"n_components": 5, "mode": "by_channel_local"}
-params["SI_JOB_KWARGS"] = {"n_jobs": -1, "chunk_size": 30000}
 
 ephys.ClusteringParamSet.insert_new_params(
     clustering_method="spykingcircus2",
-    paramset_desc="Default parameter set for spyking circus2",
+    paramset_desc="Default parameter set for spyking circus2 using SpikeInterface v0.101.*",
     params=params,
     paramset_idx=0,
 )
