@@ -7,7 +7,7 @@ name = "utah_organoids"
 version = "0.14.0"
 description = "Organoids electrophysiology pipeline using the DataJoint elements"
 readme = "README.md"
-requires-python = "<3.10"
+requires-python = "<3.11"
 license = { file = "LICENSE" }
 authors = [{ name = "DataJoint", email = "info@datajoint.com" }]
 keywords = [
