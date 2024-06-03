@@ -430,7 +430,7 @@ class plot:
                 error_i = errorbar[i]
                 error_ax.append(plt.errorbar(x_i , bar_i , yerr=error_i , fmt='o' , color='k' , capsize=4 , markersize=0))
 
-            if not points == None:
+            if points is not None:
                 points_i = points[i]            
                 points_ax.append([])
                 for ii in range(numbar):
