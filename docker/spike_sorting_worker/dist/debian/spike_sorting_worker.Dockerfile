@@ -12,8 +12,6 @@ RUN apt update && \
    chown -R jovyan:users /usr/local/bin/kernel-launchers
 CMD /usr/local/bin/bootstrap-kernel.sh
 
-RUN apt install g++ -y
-
 ARG DOCKER_GID=1001
 RUN groupadd -o -g ${DOCKER_GID} docker || groupmod -o -g ${DOCKER_GID} docker
 RUN usermod -aG docker jovyan
