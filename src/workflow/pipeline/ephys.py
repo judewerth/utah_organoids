@@ -39,7 +39,10 @@ if not ephys.schema.is_activated():
 
 
 # Add "spykingcircus2" to ClusteringMethod
-ephys.ClusteringMethod.insert1({"clustering_method": "spykingcircus2", "clustering_method_desc": ""}, skip_duplicates=True)
+ephys.ClusteringMethod.insert1(
+    {"clustering_method": "spykingcircus2", "clustering_method_desc": ""},
+    skip_duplicates=True,
+)
 
 # Insert into ClusteringParamSet
 # si.sorters.get_default_sorter_params('kilosort2_5') # api for getting default sorting parameters
@@ -98,4 +101,3 @@ try:
     )
 except Exception as e:
     logger.warning(f"Cannot create new paramset - {str(e)}")
-
