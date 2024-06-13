@@ -85,7 +85,7 @@ Get started with the Utah Organoids project by following these steps:
     + By creating a `.env` file containing these credentials as environment variables
 
 ## Troubleshooting
-+ If you encounter the following error during the (5) step in the `Initial Configuration Instructions` on MacOS with an M2 processor:
++ If you encounter the following error during the (5) step in the `Initial Configuration Instructions`:
 
     ```ERROR: Could not build wheels for datajoint, which is required to install pyproject.toml-based projects```
 
