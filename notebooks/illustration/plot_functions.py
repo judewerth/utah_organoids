@@ -366,7 +366,7 @@ class data:
 
             else:
                 # get task data query
-                task_query = global_query & f"organoid_id='{task_info['organoid']}' AND start_time='{task_info['start_time']}' AND end_time='{task_info['end_time']}'"
+                task_query = global_query & task
 
                 if len(task_query) == 0:
 
@@ -570,7 +570,7 @@ class format:
         else:
             return values_list
 
-    def bar(data , bargap = .2 , groupgap = .2 , first_call = True):
+    def bar(data , bargap = .2 , groupgap = .2 , first_call = True , groups=True):
         # Assuming data is a dictionary (could be nested) with values as type list: 
         # if points = True
         #   nest order = point values + bar/error values <--- group sorting <--- axis sorting <--- misc. sorting
@@ -594,6 +594,10 @@ class format:
         x_list = []
 
         groupoffset = 0
+
+        if not groups:
+            x_list = {}
+            bar_list = {}
 
         for key1 , value1 in dict1.items(): # Axis level - [drugs]
 
@@ -650,14 +654,22 @@ class format:
                     points["xvalues"] = list(x_list + ((np.random.random(len(x_list)))-1/2)*(bargap/2))
 
             elif isinstance(value1 , list):
+                # This will only happen if the original isn't nested
                 get_points = False
 
-                # This will only happen if the original isn't nested
-                bar_list.extend(value1)
+                if groups:
+                    
+                    bar_list.extend(value1)
 
-                xgroup = list(np.arange(len(value1))*bargap + groupoffset)
-                groupoffset = xgroup[-1] + bargap + groupgap
-                x_list.extend(xgroup)
+                    xgroup = list(np.arange(len(value1))*bargap + groupoffset)
+                    groupoffset = xgroup[-1] + bargap + groupgap
+                    x_list.extend(xgroup)
+
+                else:
+                    bar_list[key1] = value1
+                    
+                    xgroup = list(np.arange(len(value1))*bargap)
+                    x_list[key1] = xgroup
         
         if not get_points:
             bar_data["data"] = bar_list
@@ -715,7 +727,7 @@ class plot:
     def get_line(line_data , xvalues = None):
         # get line plot
 
-        # line = 1D numpy line to be drawn
+        # line = 1D numpy line to be drawn or 2D numpy with multiple lines to be drawn
         # x = 1D numpy or None 
 
         if xvalues is None:
