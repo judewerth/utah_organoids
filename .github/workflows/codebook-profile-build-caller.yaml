@@ -17,10 +17,7 @@ on:
         default: "standard"
         options:
           - standard
-          - spike_processing
           - spike_sorting
-          - calcium_imaging
-          - dlc
 
 jobs:
   get_meta:
