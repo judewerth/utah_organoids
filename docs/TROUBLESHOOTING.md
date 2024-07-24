@@ -2,7 +2,7 @@
 
 ## Debugging
 
-Debugging `populate` function: If you encounter issues with the `populate` function in your DataJoint pipeline, refer to the [RUN Debugging Guide](../notebooks/RUN_debugging_guide.ipynb) notebook. This resource provides useful insights for troubleshooting and resolving common problems during data population.
+Debugging `populate` function: If you encounter issues with the `populate` function in your DataJoint pipeline, refer to the [RUN_debug notebooks](../notebooks/RUN_debug_spike_sorting.ipynb). This resource provides useful insights for troubleshooting and resolving common problems during data population.
 
 ## Local Installation Troubleshooting
 
