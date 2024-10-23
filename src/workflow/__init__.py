@@ -2,6 +2,10 @@ import os
 
 import datajoint as dj
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 os.environ["DJ_SUPPORT_FILEPATH_MANAGEMENT"] = "TRUE"
 
 dj.config["filepath_checksum_size_limit"] = 1000000000
