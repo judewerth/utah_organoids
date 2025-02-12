@@ -31,7 +31,6 @@ class MUAEphysSession(dj.Computed):
     session_duration = timedelta(minutes=1)
 
     def make(self, key):
-        # key = (culture.Experiment & "organoid_id = 'MB07'").fetch1("KEY")
         exp_start, exp_end = (culture.Experiment & key).fetch1(
             "experiment_start_time", "experiment_end_time"
         )
@@ -234,3 +233,12 @@ class SpikeThresholdAnalysis(dj.Computed):
                 / 3600,
             }
         )
+
+
+def _plot_trace_with_peaks(trace, peak_indices):
+    import matplotlib.pyplot as plt
+
+    fig, ax = plt.subplots()
+    ax.plot(trace)
+    ax.plot(peak_indices, trace[peak_indices], "ro")
+    return fig
