@@ -10,9 +10,9 @@ This document provides a step-by-step guide for accessing and using the **Utah O
 
 ## Accessing the Utah Organoids DataJoint Pipeline
 
-1. Request access and account at [DataJoint Works account](https://accounts.datajoint.com/).
-     1. Contact DataJoint team for access & account creation.
-     2. Once approved, you will receive **DataJoint credentials (username and password)** to access the DataJoint Works account, the Organoids SciViz website, and to connect to the database locally.
+1. Request access to a **DataJoint Works** account:
+     1. Contact a member of the DataJoint SciOps team (milagros@datajoint.com) to request a new account.
+     2. Once approved, you will receive your **DataJoint credentials (username and password)** granting access to the DataJoint Works account, the Organoids SciViz website, and local database connections. 
 
 ## Standard Operating Procedure for the Organoids Generation Pipeline
 
