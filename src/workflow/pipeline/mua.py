@@ -10,7 +10,7 @@ from spikeinterface import extractors, preprocessing
 from element_interface.utils import find_full_path
 
 from workflow import DB_PREFIX
-from workflow.pipeline import culture, ephys, ephys_sorter
+from workflow.pipeline import culture, ephys
 
 
 schema = dj.schema(DB_PREFIX + "mua")
@@ -26,7 +26,7 @@ class MUAEphysSession(dj.Computed):
     port_id: char(2)  # e.g. A, B, C, ... 
     """
 
-    key_source = culture.Experiment & "organoid_id in ('MB05', 'MB06', 'MB07', 'MB08')"
+    key_source = culture.Experiment & "organoid_id in ('MB05', 'MB06', 'MB07', 'MB08', 'E9', 'E10', 'E11', 'E12', 'O25', 'O26', 'O27', 'O28')"
 
     session_duration = timedelta(minutes=1)
 
@@ -76,12 +76,12 @@ class MUAEphysSession(dj.Computed):
 
 
 @schema
-class SpikeThresholdAnalysis(dj.Computed):
+class MUASpikes(dj.Computed):
     definition = """
     -> MUAEphysSession
     ---
     threshold_uv: float  # uV threshold for spike detection
-    peak_sign: varchar(8)  # 'neg' or 'pos' for negative or positive peaks
+    peak_sign: enum('pos', 'neg', 'both')  # peak sign for spike detection
     execution_duration: float  # execution duration in hours
     """
 
