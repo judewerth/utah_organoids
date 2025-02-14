@@ -10,10 +10,10 @@ This document provides a step-by-step guide to accessing and using the **Utah Or
 
 - **Array Ephys Pipeline**: Handles ephys data analysis, managing metadata and raw data related to probes and ephys recordings. It also includes preprocessing, spike sorting, curation, and quality metrics computations.
 
-## Accessing the Utah Organoids DataJoint Pipeline
+## Accessing the Organoids DataJoint Pipeline
 
 1. **Request access to a DataJoint account**:
-     1. Request a new account at support@datajoint.com.
+     1. Request a new account from your DataJoint support team.
      2. Once approved, you will receive your **DataJoint credentials (username and password)** granting access to:
      - DataJoint platform
      - Organoids SciViz website
@@ -37,6 +37,7 @@ This document provides a step-by-step guide to accessing and using the **Utah Or
             - Provide the experiment data directory — the relative path to where the acquired data is stored.
 
 **Note**: Clicking on read-only tables may cause the page to become unresponsive (white screen). This is a known issue currently being fixed. For now, please refresh and re-login.
+
 ## Standard Operating Procedure for the Array Ephys Pipeline
 
 3. Follow these [instructions](#upload-data-from-your-local-machine-to-the-cloud) to upload the acquired data before proceeding.
@@ -62,7 +63,7 @@ This document provides a step-by-step guide to accessing and using the **Utah Or
 
 1. Ensure that the local folder you want to upload follows the [file structure guidelines here](https://github.com/dj-sciops/utah_organoids/blob/main/docs/DATA_ORGANIZATION.md).
 2. You need Axon credentials to upload raw data from you local machine to the cloud. If you don't have them yet:
-    1. Request them from the DataJoint team.
+    1. Request them from your DataJoint support team.
     2. Once approved, you’ll be provided with Axon credentials (account_id, client_id, client_secret, issuer, bucket, role) to upload to the AWS S3 bucket.
 3. Set up the following configurations on your local machine (if you haven't already):  
     1. Install the pipeline code on your computer. Follow the [installation instructions here](https://github.com/dj-sciops/utah_organoids/blob/main/docs/INSTALLATION_AND_CONFIGURATION_INSTRUCTIONS.md#installation-of-the-pipeline-codebase).  
@@ -87,7 +88,7 @@ This document provides a step-by-step guide to accessing and using the **Utah Or
 ### Download Spike Sorting Results to Your Local Machine
 
 1. You need Axon credentials to download the spike sorting results from the cloud to your local machine. If you don't have them yet:
-    1. Request them from the DataJoint team.
+    1. Request them from your DataJoint support team.
     2. Once approved, you’ll be provided with Axon credentials (account_id, client_id, client_secret, issuer, bucket, role) to download results from the AWS S3 bucket.
 2. Set up the following configurations on your local machine (if you haven't already):  
     1. Install the pipeline code on your computer. Follow the [installation instructions here](https://github.com/dj-sciops/utah_organoids/blob/main/docs/INSTALLATION_AND_CONFIGURATION_INSTRUCTIONS.md#installation-of-the-pipeline-codebase).  
@@ -111,4 +112,5 @@ This document provides a step-by-step guide to accessing and using the **Utah Or
 
 
 ## Troubleshooting
+
 For assistance, refer to the [Troubleshooting Guide](TROUBLESHOOTING.md), which provides solutions to common issues encountered during pipeline setup and execution. If you need further help, feel free to contact the DataJoint SciOps team.
