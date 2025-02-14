@@ -17,7 +17,7 @@ This document provides a step-by-step guide to accessing and using the **Utah Or
      2. Once approved, you will receive your **DataJoint credentials (username and password)** granting access to:
      - DataJoint platform
      - Organoids SciViz website
-     - Local database connections
+     - Database connections
 
 ## Standard Operating Procedure for the Organoids Generation Pipeline
 
