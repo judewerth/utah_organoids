@@ -22,18 +22,18 @@ This document provides a step-by-step guide to accessing and using the **Utah Or
 ## Standard Operating Procedure for the Organoids Generation Pipeline
 
 2. **Enter metadata into the Organoids Generation Pipeline**: 
-    1. Manually input relevant data using the provided entry forms on the SciViz website.
-    2. Log in to [Organoids SciViz](https://organoids.datajoint.com/) with your DataJoint credentials (username and password).
+    1. Manually enter data through the forms on the SciViz website.
+    2. Log into [Organoids SciViz](https://organoids.datajoint.com/) with your DataJoint credentials (username and password).
     3. Use the "Form" sections in each tab to enter details about your organoid generation protocol:
         - `User` page → if you are a new experimenter, create a new user
-        - `Linage` page → create new “Linage” and submit; create new “Sequence” and submit
+        - `Lineage` page → create new “Lineage” and submit; create new “Sequence” and submit
         - `Stem Cell` page → create new “Stem Cell”
         - `Induction` page → add new “Induction Culture” and “Induction Culture Condition”
         - `Post Induction` page → add new “Post Induction Culture” and “Post Induction Culture Condition”
-        - `Isolated Rossette` page → add new “Isolated Rossette Culture” and “Isolated Rossette Culture Condition”
+        - `Isolated Rosette` page → add new “Isolated Rosette Culture” and “Isolated Rosette Culture Condition”
         - `Organoid` page → add new “Organoid Culture” and “Organoid Culture Condition”
         - `Experiment` page → add new experiments performed on a particular organoid
-            - Include organoids ID, datetime, experimenter, condition, etc.
+            - Include organoid ID, datetime, experimenter, condition, etc.
             - Provide the experiment data directory — the relative path to where the acquired data is stored.
 
 **Note**: The "Table" sections in each tab display existing data entries in a tabular format but are not interactive. Clicking on them may cause the website to become unresponsive (white screen), requiring to refresh and re-login.
