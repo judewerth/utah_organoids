@@ -13,7 +13,7 @@ This document provides a step-by-step guide to accessing and using the **Utah Or
 ## Accessing the Utah Organoids DataJoint Pipeline
 
 1. **Request access to a DataJoint account**:
-     1. Contact a member of the DataJoint SciOps team (milagros@datajoint.com) to request a new account.
+     1. Request a new account at support@datajoint.com.
      2. Once approved, you will receive your **DataJoint credentials (username and password)** granting access to:
      - DataJoint platform
      - Organoids SciViz website
