@@ -208,9 +208,9 @@ class MUATracePlot(dj.Computed):
         average_waveform: longblob
         """
 
-    key_source = MUASpikes & (MUASpikes.Channel & "spike_rate > 0.5")
-
     spike_rate_threshold = 0.5
+
+    key_source = MUASpikes & (MUASpikes.Channel & f"spike_rate >= {spike_rate_threshold}")
 
     def make(self, key):
         execution_time = datetime.now(timezone.utc)
@@ -262,7 +262,7 @@ class MUATracePlot(dj.Computed):
             self.Channel.insert1(
                 {
                     **key,
-                    **chn_data,
+                    "channel_idx": chn_data["channel_idx"],
                     "trace_plot": json.loads(fig.to_json()),
                     "average_waveform": mean_wf,
                 }
