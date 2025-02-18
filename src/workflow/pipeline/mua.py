@@ -397,8 +397,8 @@ def _plot_trace_with_peaks(
         title=title,
         yaxis_title="Amplitude (uV)",
         xaxis_title="Time (s)",
-        width=1200,  # Adjust width for better interactivity
-        height=800,  # Adjust height for better visibility
+        width=1000,  # Adjust width for better interactivity
+        height=400,
     )
 
     return fig
