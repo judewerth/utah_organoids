@@ -48,7 +48,6 @@ What are you aiming to achieve with the pipeline?
   2. Log in [DataJoint Works platform](https://works.datajoint.com/) (no installation required) 
   3. In the `Notebooks` tab, run the `utah_organoids/notebooks/` notebooks. These notebooks showcase each pipeline modality and its results, for example:
         - `EXPLORE` notebooks to explore the curent pipeline architecture and results, e.g., `EXPLORE_pipeline_architecture.ipynb` to explore the main schemas that compound the pipeline architecture for this project.
-
 ## SciViz website
 
 Data viewer for the Utah Organoids DataJoint pipeline. Please use the entry forms provided on the website to manually input relevant data entries.
