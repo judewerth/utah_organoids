@@ -86,8 +86,8 @@ class MUAEphysSession(dj.Computed):
 class MUASpikes(dj.Computed):
     definition = """
     -> MUAEphysSession
+    threshold_uv: decimal(5,1)  # uV threshold for spike detection
     ---
-    threshold_uv: float  # uV threshold for spike detection
     peak_sign: enum('pos', 'neg', 'both')  # peak sign for spike detection
     fs: float  # sampling frequency in Hz
     execution_duration: float  # execution duration in hours
@@ -108,8 +108,8 @@ class MUASpikes(dj.Computed):
 
     key_source = MUAEphysSession & "start_time >= '2024-09-07'"
 
-    threshold_uV = 25  # 25 uV
-    peak_sign = "neg"
+    threshold_uV = 50  # 50 uV
+    peak_sign = "both"
 
     def make(self, key):
         execution_time = datetime.now(timezone.utc)
@@ -154,22 +154,24 @@ class MUASpikes(dj.Computed):
             trace = np.squeeze(
                 si_recording.get_traces(channel_ids=[ch_id], return_scaled=True)
             )
-
-            if peak_sign == "neg":
-                trace = -trace
-
             # median absolute deviation
             noise_level = scipy.stats.median_abs_deviation(trace, scale="normal")
-
             # spike detection
             threshold_uV = max(threshold_uV, 5 * noise_level)
-            spk_ind, spk_amp = find_peaks(
-                trace, height=threshold_uV, distance=refractory_samples
-            )
-
-            spk_amp = spk_amp["peak_heights"]
             if peak_sign == "neg":
-                spk_amp = -spk_amp
+                spk_ind, spk_amp = find_peaks(
+                    -trace, height=threshold_uV, distance=refractory_samples
+                )
+                spk_amp = -spk_amp["peak_heights"]
+            elif peak_sign == "both":
+                spk_ind, spk_amp = find_peaks(
+                    np.abs(trace), height=threshold_uV, distance=refractory_samples
+                )
+                spk_amp = trace[spk_ind]
+            else:
+                spk_ind, spk_amp = find_peaks(
+                    trace, height=threshold_uV, distance=refractory_samples
+                )
 
             self.Channel.insert1(
                 dict(
@@ -216,7 +218,7 @@ class MUATracePlot(dj.Computed):
 
     spike_rate_threshold = 0.5
 
-    key_source = MUASpikes & (
+    key_source = MUASpikes & {"threshold_uv": 50} & (
         MUASpikes.Channel & f"spike_rate >= {spike_rate_threshold}"
     )
 
@@ -251,7 +253,7 @@ class MUATracePlot(dj.Computed):
         )
 
         tmp_dir = tempfile.TemporaryDirectory()
-
+        peak_sign = (MUASpikes & key).fetch1("peak_sign")
         chn_query = MUASpikes.Channel & key & f"spike_rate >= {spk_rate_thres}"
         for chn_data in chn_query.fetch(as_dict=True):
             ch_id = si_recording.channel_ids[chn_data["channel_idx"]]
@@ -259,6 +261,10 @@ class MUATracePlot(dj.Computed):
                 si_recording.get_traces(channel_ids=[ch_id], return_scaled=True)
             )
             spk_ind = chn_data["spike_indices"]
+
+            if peak_sign == "both":
+                # get the "neg" peaks only
+                spk_ind = spk_ind[np.where(chn_data["spike_amp"] < 0)[0]]
 
             title_ = title + f" | ChnID: {ch_id}"
             # waveform plot
