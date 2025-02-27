@@ -51,6 +51,7 @@ What are you aiming to achieve with the pipeline?
 - _Goal_: **Explore the current pipeline architecture and results** without running new data or new analyses, and with no installation required.
 
 - _Steps_:
+
   1. Request access to a DataJoint account:
      1. Request a new account from your DataJoint support team.
      2. Once approved, you will receive your DataJoint credentials (username and password) to access:
