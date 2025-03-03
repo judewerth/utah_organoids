@@ -64,10 +64,11 @@ The **Utah Organoids DataJoint pipelines** facilitate **cerebral organoid charac
           - Click on the "Run Cell" button in the top right corner of each code cell to execute the code.
           - Follow the instructions in the notebook to upload your data to the cloud.
 
-### **Multi-Unit Activity (MUA) Analysis on Raw Traces**
+### **Analyzing Multi-Unit Activity (MUA) in Raw Traces**  
 
-  1. Go to [works.datajoint.com](works.datajoint.com) → `Notebook` tab
-  2. Open [EXPLORE_MUA_analysis.ipynb](https://github.com/dj-sciops/utah_organoids/blob/main/notebooks/EXPLORE_MUA_analysis.ipynb) to inspect MUA analysis results for Mouse Brain datasets.
+1. Navigate to [works.datajoint.com](works.datajoint.com) and open the `Dashboard` tab.  
+2. Click on `Plots` > `MUA Trace Plots`, then select a data entry to explore the MUA results. The interactive plot allows you to zoom in and out of the raw traces and examine detected peaks.  
+3. (Optional) For a more detailed analysis, go to the `Notebook` tab on [works.datajoint.com](works.datajoint.com) and run the [EXPLORE_MUA_analysis.ipynb](https://github.com/dj-sciops/utah_organoids/blob/main/notebooks/EXPLORE_MUA_analysis.ipynb) notebook to inspect the `MUA` schema in depth.
 
 ### **Define an `EphysSession`** (i.e. a time-window for ephys analysis)
 
