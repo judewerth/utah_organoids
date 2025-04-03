@@ -19,15 +19,14 @@ class SpectralBand(dj.Lookup):
     upper_freq: float # (Hz)
     """
     contents = [
-        ("delta", 1.0, 4.0),
+        ("delta", 2.0, 4.0),
         ("theta", 4.0, 7.0),
         ("alpha", 8.0, 12.0),
         ("beta", 13.0, 30.0),
         ("gamma", 30.0, 50.0),
         ("highgamma1", 70.0, 110.0),
-        ("highgamma2", 130.0, 200.0),
+        ("highgamma2", 130.0, 500.0),
     ]
-    # previous bands: delta 2.0, 4.0; highgamma2 130.0, 500.0
 
 
 @schema
@@ -39,33 +38,7 @@ class SpectrogramParameters(dj.Lookup):
     overlap_size=0:  float    # Time in seconds
     description="":  varchar(64)
     """
-    contents = [(0, 0.25, 0.125, "Default 0.25s time segments with half overlap.")]
-
-
-#     contents = [(0, 0.5, 0.0, "Default 0.5s time segments without overlap.")]
-
-
-@schema
-class AnalysisParameters(dj.Lookup):
-    definition = """
-    param_set: varchar(32)
-    ---
-    rms_min: float  # Minimum RMS threshold (μV)
-    rms_max: float  # Maximum RMS threshold (μV)
-    impedance_min: float  # Minimum impedance threshold (MΩ)
-    impedance_max: float  # Maximum impedance threshold (MΩ)
-    description: varchar(128)
-    """
-    contents = [
-        (
-            "default",
-            4.0,
-            100.0,
-            0.05,
-            2.0,
-            "Default analysis parameters from MATLAB code",
-        )
-    ]
+    contents = [(0, 0.5, 0.0, "Default 0.5s time segments without overlap.")]
 
 
 @schema
@@ -121,7 +94,6 @@ class LFPSpectrogram(dj.Computed):
             nperseg=int(window_size * lfp_sampling_rate),
             noverlap=int(overlap_size * lfp_sampling_rate),
             window="boxcar",
-            scaling="density",  # Use density scaling
         )
 
         # Store spectrogram results
