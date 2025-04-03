@@ -43,7 +43,8 @@ class SpectrogramParameters(dj.Lookup):
 
 @schema
 class LFPSpectrogram(dj.Computed):
-    """Calculate spectrogram at each channel.
+    """Calculate spectrogram at each channel, extracts power in frequency bands,
+    and handles electrode mapping.
 
     Assumes the LFP is:
         1. Low-pass filtered at 1000 Hz.
@@ -84,7 +85,9 @@ class LFPSpectrogram(dj.Computed):
 
         lfp_sampling_rate = (ephys.LFP & key).fetch1("lfp_sampling_rate")
 
+        # Get LFP data and calculate spectrogram
         lfp = (ephys.LFP.Trace & key).fetch1("lfp")
+
         frequency, time, Sxx = signal.spectrogram(
             lfp,
             fs=int(lfp_sampling_rate),
@@ -93,15 +96,18 @@ class LFPSpectrogram(dj.Computed):
             window="boxcar",
         )
 
+        # Store spectrogram results
         self.ChannelSpectrogram.insert1(
             {**key, "spectrogram": Sxx, "frequency": frequency, "time": time}
         )
+
+        # Calculate power in each frequency band
         band_keys, lower_frequencies, upper_frequencies = SpectralBand.fetch(
             "KEY", "lower_freq", "upper_freq"
         )
         for power_key, fl, fh in zip(band_keys, lower_frequencies, upper_frequencies):
             freq_mask = np.logical_and(frequency >= fl, frequency < fh)
-            power = Sxx[freq_mask, :].mean(axis=0)  # mean across freq domain
+            power = Sxx[freq_mask, :].mean(axis=0)  # Mean across frequencies
             self.ChannelPower.insert1(
                 dict(
                     **power_key,

@@ -63,7 +63,7 @@ class SpectrogramAndPowerPlots(dj.Computed):
     def make(self, key):
         execution_time = datetime.now(timezone.utc)
 
-        FREQ_MIN, FREQ_MAX = 0.1, 200  # Match MATLAB highgamma2 upper limit
+        FREQ_MIN, FREQ_MAX = 0.1, 200  # Match highgamma2 upper limit
 
         self.insert1(
             {**key, "freq_min": FREQ_MIN, "freq_max": FREQ_MAX, "execution_duration": 0}
@@ -77,7 +77,7 @@ class SpectrogramAndPowerPlots(dj.Computed):
         )
         bands = analysis.SpectralBand.fetch()
 
-        # MATLAB color scheme for frequency bands
+        # Color scheme for frequency bands
         lfp_colors = [
             "#ad2bea",
             "#4d3ff8",
@@ -88,20 +88,19 @@ class SpectrogramAndPowerPlots(dj.Computed):
             "#ed3838",
         ]
 
-        # Process each electrode/channel separately
+        # Process each electrode separately
         for ch_data in spectrograms:
             electrode = ch_data["electrode"]
             Sxx, t, f = ch_data["spectrogram"], ch_data["time"], ch_data["frequency"]
             freq_mask = (f >= FREQ_MIN) & (f <= FREQ_MAX)
 
-            # Create spectrogram plot similar to BU_Plots.m for this electrode
+            # Create spectrogram plot
             fig_spectrogram, ax = plt.subplots(figsize=(12, 8))
 
-            # Use log10 scale for power as in BU_Plots.m
+            # Use log10 scale for power
             im = ax.pcolormesh(
                 t, f[freq_mask], np.log10(Sxx[freq_mask, :]), shading="auto"
             )
-            # t, f[freq_mask], np.log(Sxx[freq_mask, :]), shading="auto"
             fig_spectrogram.colorbar(im, ax=ax, label="log Power")
             ax.set_xlabel("Time (s)")
             ax.set_ylabel("Frequency (Hz)")
@@ -136,7 +135,7 @@ class SpectrogramAndPowerPlots(dj.Computed):
             fig_spectrogram.savefig(filepath_spectrogram)
             plt.close(fig_spectrogram)
 
-            # Create band power plot similar to BU_Plots.m for this electrode
+            # Create band power plot
             fig_band_power, ax = plt.subplots(figsize=(12, 8))
 
             # Plot each frequency band power for this electrode
@@ -146,7 +145,7 @@ class SpectrogramAndPowerPlots(dj.Computed):
                     & {**key, "band_name": band["band_name"], "electrode": electrode}
                 ).fetch1("power")
 
-                # Normalize power (as in BU_Plots.m)
+                # Normalize power
                 normalized_power = (
                     band_data / np.nanmax(band_data)
                     if np.nanmax(band_data) > 0
@@ -163,7 +162,7 @@ class SpectrogramAndPowerPlots(dj.Computed):
 
             ax.set_xlabel("Time (s)")
             ax.set_ylabel("Normalized Power")
-            ax.set_yscale("log")  # Log scale for power as in BU_Plots.m
+            ax.set_yscale("log")  # Log scale for power
             ax.set_title(
                 f"Band Power Plot \n Organoid {key['organoid_id']} | {key['start_time']} - {key['end_time']} \n Ch {electrode}"
             )
