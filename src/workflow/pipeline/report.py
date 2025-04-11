@@ -63,7 +63,7 @@ class SpectrogramAndPowerPlots(dj.Computed):
     def make(self, key):
         execution_time = datetime.now(timezone.utc)
 
-        FREQ_MIN, FREQ_MAX = 0.1, 200  # Match highgamma2 upper limit
+        FREQ_MIN, FREQ_MAX = 0.1, 500  # Match highgamma2 upper limit
 
         self.insert1(
             {**key, "freq_min": FREQ_MIN, "freq_max": FREQ_MAX, "execution_duration": 0}
