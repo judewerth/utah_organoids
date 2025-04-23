@@ -106,7 +106,7 @@ class MUASpikes(dj.Computed):
         spike_amp: longblob    # spike amplitudes in uV
         """
 
-    key_source = MUAEphysSession & "start_time >= '2024-09-07'"
+    key_source = MUAEphysSession
 
     threshold_uV = 50  # 50 uV
     peak_sign = "both"
@@ -218,8 +218,10 @@ class MUATracePlot(dj.Computed):
 
     spike_rate_threshold = 0.5
 
-    key_source = MUASpikes & {"threshold_uv": 50} & (
-        MUASpikes.Channel & f"spike_rate >= {spike_rate_threshold}"
+    key_source = (
+        MUASpikes
+        & {"threshold_uv": 50}
+        & (MUASpikes.Channel & f"spike_rate >= {spike_rate_threshold}")
     )
 
     def make(self, key):
