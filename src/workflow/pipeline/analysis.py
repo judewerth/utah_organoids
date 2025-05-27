@@ -89,75 +89,97 @@ class SpectrogramParameters(dj.Lookup):
 
 @schema
 class LFPSpectrogram(dj.Computed):
-    """Calculate spectrogram at each channel, extracts power in frequency bands,
-    and handles electrode mapping.
-
-    Assumes the LFP is:
-        1. Low-pass filtered at 1000 Hz.
-        2. Notch filtered at 50/60 Hz.
-        3. Resampled to 2500 Hz.
-    """
-
+    """Spectrograms and frequency-domain power metrics for each LFP trace."""
     definition = """
     -> ephys.LFP.Trace
     -> SpectrogramParameters
+    ---
+    delta_band_mean_power: float  # Average delta power (1-4 Hz) over entire recording (μV²/Hz)
+    alpha_band_mean_power: float  # Average alpha power (8-12 Hz) over entire recording (μV²/Hz)
+    delta_alpha_ratio_mean: float # Mean delta/alpha power ratio (unitless)
+    power_range_90pct: float      # 90% range (95th-5th percentile) of broadband RMS amplitude envelope (μV RMS)
     """
 
     class ChannelSpectrogram(dj.Part):
         definition = """
         -> master
         ---
-        spectrogram: longblob # Power with dimensions (frequency, time)
-        time: longblob        # Timestamps 
-        frequency: longblob   # Fourier frequencies
+        spectrogram: longblob  # Spectrogram matrix (freq x time) (μV²/Hz)
+        time: longblob         # Time bins (s)
+        frequency: longblob    # Frequency bins (Hz)
         """
 
     class ChannelPower(dj.Part):
+        """Power in each frequency band, per LFP trace."""
         definition = """
         -> master
         -> SpectralBand
         ---
-        power: longblob   # Mean power in spectral band as a function of time
-        mean_power: float # Mean power in a spectral band for a time window.
-        std_power: float  # Standard deviation of the power in a spectral band for a time window.
+        power_time_series: longblob  # Power time series for this band (μV²/Hz)
+        mean_power: float            # Mean band power (μV²/Hz)
+        std_power: float             # Std dev of band power (μV²/Hz)
         """
 
     def make(self, key):
-        self.insert1(key)
-
+        # Load LFP trace and sampling rate
         lfp = (ephys.LFP.Trace & key).fetch1("lfp")
         fs = (ephys.LFP & key).fetch1("lfp_sampling_rate")
-        win_params = (SpectrogramParameters & key).fetch1("window_size", "overlap_size")
 
-        nperseg = int(win_params[0] * fs)
-        noverlap = int(win_params[1] * fs)
+        # Spectrogram window parameters
+        window_size, overlap_size = (SpectrogramParameters & key).fetch1("window_size", "overlap_size")
+        nperseg = int(window_size * fs)
+        noverlap = int(overlap_size * fs)
 
+        # Compute spectrogram
         freq, t, Sxx = signal.spectrogram(
-            lfp,
-            fs=fs,
-            window="tukey",
-            nperseg=nperseg,
-            noverlap=noverlap,
-            scaling="density",
-            mode="psd",
+            lfp, fs=fs, window="tukey",
+            nperseg=nperseg, noverlap=noverlap,
+            scaling="density", mode="psd"
         )
 
-        # Store spectrogram results
-        self.ChannelSpectrogram.insert1(
-            {**key, "spectrogram": Sxx, "frequency": freq, "time": t}
-        )
+        # Insert overall spectrogram
+        self.insert1(key)
+        self.ChannelSpectrogram.insert1({
+            **key,
+            "spectrogram": Sxx,
+            "frequency": freq,
+            "time": t,
+        })
 
-        # Calculate power in each frequency band
-        band_keys, f_lo, f_hi = SpectralBand.fetch("KEY", "lower_freq", "upper_freq")
+        # Compute band power metrics
+        band_powers = {}
+        for band in (SpectralBand()).fetch(as_dict=True):
+            band_mask = (freq >= band["lower_freq"]) & (freq < band["upper_freq"])
+            band_power = Sxx[band_mask].mean(axis=0) if band_mask.any() else np.zeros_like(t)
+            band_powers[band["band_name"]] = band_power
 
-        for band_key, fl, fh in zip(band_keys, f_lo, f_hi):
-            band_mask = np.logical_and(freq >= fl, freq < fh)
-            power = Sxx[band_mask].mean(axis=0) if band_mask.any() else np.zeros_like(t)
             self.ChannelPower.insert1({
                 **key,
-                **band_key,
-                "power": power,
-                "mean_power": float(power.mean()),
-                "std_power": float(power.std()),
+                "band_name": band["band_name"],
+                "power_time_series": band_power,
+                "mean_power": float(band_power.mean()),
+                "std_power": float(band_power.std()),
             })
 
+        # Compute delta/alpha power ratio
+        delta_power = band_powers.get("delta", np.zeros_like(t))
+        alpha_power = band_powers.get("alpha", np.ones_like(t) * 1e-12)  # Avoid division by zero
+        ratio_trace = delta_power / (alpha_power + 1e-12)
+
+        # Compute session-level summary metrics
+        delta_band_mean_power = float(delta_power.mean())
+        alpha_band_mean_power = float(alpha_power.mean())
+        delta_alpha_ratio_mean = float(ratio_trace.mean())
+
+        # 90% amplitude envelope range (μV RMS)
+        amp_envelope = np.sqrt(np.mean(Sxx, axis=0))  # broadband RMS amplitude envelope
+        power_range_90pct = float(np.percentile(amp_envelope, 95) - np.percentile(amp_envelope, 5))
+
+        # Insert final summary metrics
+        self.update1({
+            **key,
+            "delta_band_mean_power": delta_band_mean_power,
+            "alpha_band_mean_power": alpha_band_mean_power,
+            "delta_alpha_ratio_mean": delta_alpha_ratio_mean,
+            "power_range_90pct": power_range_90pct,
+        })
