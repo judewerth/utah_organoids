@@ -82,10 +82,10 @@ class SpectrogramParameters(dj.Lookup):
     """
     contents = [
         (0, 0.5, 0.0, "Default 0.5s time segments without overlap."),
-        (1, 0.5, 0.25, "Default 0.5s window, 50% overlap (slow rhythms)"),
-        (2, 0.2, 0.1, "0.2s window, 50% overlap (fast rhythms)")
+        (1, 2.0, 1.0, "2s window, 50% overlap (delta)"),
+        (2, 0.5, 0.25, "0.5s window, 50% overlap (theta/beta)"),  
+        (3, 0.2, 0.1, "0.2s window, 50% overlap (gamma/high-gamma)")
     ]
-        
 
 @schema
 class LFPSpectrogram(dj.Computed):
