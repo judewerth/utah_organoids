@@ -85,10 +85,9 @@ class SpectrogramParameters(dj.Lookup):
     description="":  varchar(64)
     """
     contents = [
-        (0, 0.5, 0.0, "Default 0.5s time segments without overlap."),
-        (1, 2.0, 1.0, "2s window, 50% overlap (delta)"),
-        (2, 0.5, 0.25, "0.5s window, 50% overlap (theta/beta)"),  
-        (3, 0.25, 0.125, "0.25s window, 50% overlap (high-gamma)"),
+        (0,2.0, 1.0, "2s window, 50% overlap (delta, theta, alpha)"),
+        (1, 0.5, 0.25, "0.5s window, 50% overlap (beta, gamma)"),  
+        (2, 0.25, 0.125, "0.25s window, 50% overlap (high-gamma)"),
     ]
 
 @schema
@@ -126,7 +125,7 @@ class LFPSpectrogram(dj.Computed):
 
     def key_source(self):
         # Use only the default param_idx for high-gamma windowing params for automated population
-        return (ephys.LFP.Trace * SpectrogramParameters & dict(param_idx=3))    
+        return (ephys.LFP.Trace * SpectrogramParameters & "param_idx=2")    
     
     def make(self, key):
         # Load LFP trace and sampling rate
