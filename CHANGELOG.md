@@ -1,5 +1,18 @@
 # Changelog
 
+## `V0.17.0`
+
+### Features
+
+- fix: LFPSpectrogram logic([343a88a](https://github.com/dj-sciops/utah_organoids/pull/140/commits/343a88a339f1b045a4e88d8505c84df77552c73f))
+
+- feat: add new LFPTraceQC table([048a328](https://github.com/dj-sciops/utah_organoids/pull/140/commits/048a328d82263d38a3d26b0673a436987b537d31)
+
+- fix: update params in SpectrogramParameters([f32f7e2](https://github.com/dj-sciops/utah_organoids/pull/140/commits/f32f7e23444b48fee0aab9d22e47f630c9aca668)
+
+- feat: add new attributes and logic to LFPSpectrogram ([040dc0f](https://github.com/dj-sciops/utah_organoids/pull/140/commits/040dc0f4de5599df23fbbe7c90d62aeb3a2727fa)
+
+
 ## `V0.16.0`
 
 ### Features
