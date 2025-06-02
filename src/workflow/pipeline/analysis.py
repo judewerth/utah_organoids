@@ -68,8 +68,8 @@ class LFPQC(dj.Computed):
                 **key,
                 "lfp_std": lfp_std,
                 "lfp_noise_level": lfp_noise_level,
-                "lfp_skewness": stats.skew(lfp)
-                "lfp_kurtosis": stats.kurtosis(lfp)
+                "lfp_skewness": stats.skew(lfp),
+                "lfp_kurtosis": stats.kurtosis(lfp),
             }
         )
 
@@ -152,8 +152,17 @@ class LFPSpectrogram(dj.Computed):
             mode="psd",
         )
 
-        # Insert overall spectrogram
-        self.insert1(key)
+        # Insert temporary values for non-nullable secondary attributes; will update with computed metrics below.
+        self.insert1(
+            {
+                **key,
+                "delta_band_mean_power": 0.0,
+                "alpha_band_mean_power": 0.0,
+                "delta_alpha_ratio_mean": 0.0,
+                "power_range_90pct": 0.0,
+            }
+        )
+
         self.ChannelSpectrogram.insert1(
             {
                 **key,
@@ -196,7 +205,7 @@ class LFPSpectrogram(dj.Computed):
             np.percentile(amp_envelope, 95) - np.percentile(amp_envelope, 5)
         )
 
-        # Insert final summary metrics
+        # Insert final computed summary metrics
         self.update1(
             {
                 **key,
