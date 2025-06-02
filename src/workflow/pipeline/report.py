@@ -181,7 +181,8 @@ class SpectrogramAndPowerPlots(dj.Computed):
 
                 # save power plot
                 filename_band_power = (
-                    f"organoid_{key['organoid_id']}_ch{electrode}_band_power.png"
+                    f"organoid_{key['organoid_id']}_ch{electrode}_"
+                    f"{key['start_time']}_{key['end_time']}_band_power.png"
                 )
                 filepath_band_power = tmp_path / filename_band_power
                 power_fig.savefig(filepath_band_power, bbox_inches="tight", dpi=100)
