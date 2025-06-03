@@ -2,9 +2,9 @@ import json
 import tempfile
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-import matplotlib.pyplot as plt
 
 import datajoint as dj
+import matplotlib.pyplot as plt
 import numpy as np
 import scipy.stats
 import spikeinterface as si
@@ -170,6 +170,7 @@ class MUASpikes(dj.Computed):
             self.Channel.insert1(
                 dict(
                     **key,
+                    threshold_uv=threshold_uV,
                     channel_idx=ch_idx,
                     channel_id=ch_id,
                     spike_count=len(spk_ind),
