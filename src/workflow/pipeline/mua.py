@@ -11,6 +11,7 @@ import spikeinterface as si
 from element_interface.utils import find_full_path
 from scipy.signal import find_peaks
 from spikeinterface import extractors, preprocessing
+from spikeinterface.extractors.neoextractors import IntanRecordingExtractor
 
 from workflow import DB_PREFIX
 from workflow.pipeline import culture, ephys
@@ -315,14 +316,12 @@ def _get_si_recording(start_time, end_time, parent_folder, port_id):
     """
     import intanrhdreader
 
-    files, file_times, acq_softwares = (
+    files, file_times = (
         ephys.EphysRawFile
         & {"parent_folder": parent_folder}
         & f"file_time >= '{start_time}'"
         & f"file_time < '{end_time}'"
-    ).fetch("file_path", "file_time", "acq_software", order_by="file_time")
-
-    acq_software = acq_softwares[0]
+    ).fetch("file_path", "file_time", order_by="file_time")
 
     # read intan header
     with open(find_full_path(ephys.get_ephys_root_data_dir(), files[0]), "rb") as f:
@@ -335,50 +334,25 @@ def _get_si_recording(start_time, end_time, parent_folder, port_id):
         ]
     )  # get the row indices of the port
 
-    si_recording = _build_si_recording_object(files, acq_software)
+    # Read the Intan files and concatenate them
+    recordings = []
+    for file_path in (
+        find_full_path(ephys.get_ephys_root_data_dir(), f) for f in files
+    ):
+        rec = IntanRecordingExtractor(
+            file_path=file_path, stream_id="0"
+        )  # stream_id 0 corresponds to the amplifier stream
+
+        recordings.append(rec)
+
+    if len(recordings) == 1:
+        si_recording = recordings[0]
+    else:
+        si_recording = si.concatenate_recordings(recordings)
 
     si_recording = si_recording.select_channels(
         si_recording.channel_ids[port_indices]
     )  # select only the port data
-    return si_recording
-
-
-def _build_si_recording_object(files, acq_software="intan"):
-    """
-    Build the spikeinterface recording object from the given files.
-    Args:
-        files: list of file full paths
-        acq_software: acquisition software name
-
-    Returns:
-        si_recording: SI recording object
-    """
-    si_recording = None
-
-    si_extractor: si.extractors.neoextractors = (
-        si.extractors.extractorlist.recording_extractor_full_dict[
-            acq_software.replace(" ", "").lower()
-        ]
-    )  # data extractor object
-
-    # Read data. Concatenate if multiple files are found.
-    for file_path in (
-        find_full_path(ephys.get_ephys_root_data_dir(), f) for f in files
-    ):
-        if not si_recording:
-            stream_name = [
-                s for s in si_extractor.get_streams(file_path)[0] if "amplifier" in s
-            ][0]
-            si_recording: si.BaseRecording = si_extractor(
-                file_path, stream_name=stream_name
-            )
-        else:
-            si_recording: si.BaseRecording = si.concatenate_recordings(
-                [
-                    si_recording,
-                    si_extractor(file_path, stream_name=stream_name),
-                ]
-            )
     return si_recording
 
 
