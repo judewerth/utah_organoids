@@ -38,12 +38,7 @@ class MUAEphysSession(dj.Computed):
             "experiment_start_time", "experiment_end_time"
         )
 
-        # Figure out `Port ID` from the existing EphysSession
-        if not (ephys.EphysSessionProbe & key):
-            raise ValueError(
-                f"No EphysSessionProbe found for the {key} - cannot determine the port ID"
-            )
-
+        # Figure out `Port ID` from the existing EphysSessionProbe
         port_id = set((ephys.EphysSessionProbe & key).fetch("port_id"))
         if len(port_id) > 1:
             raise ValueError(
