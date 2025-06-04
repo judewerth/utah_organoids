@@ -43,6 +43,7 @@ spike_sorting_worker = DataJointWorker(
 # -------- Define flow(s) --------
 
 # mua
+standard_worker(mua.MUAEphysSession, max_calls=20)
 standard_worker(mua.MUASpikes, max_calls=20)
 standard_worker(mua.MUATracePlot, max_calls=20)
 
