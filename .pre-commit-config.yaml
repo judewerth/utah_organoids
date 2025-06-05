@@ -2,7 +2,7 @@ default_language_version:
   python: python3.9
 files: "(workflow|notebooks)\/.*$"
 exclude: "\\.svg$"
-default_stages: [commit, push]
+default_stages: [pre-commit, pre-push]
 repos:
   # for debugging hook input arguments
   - repo: meta
