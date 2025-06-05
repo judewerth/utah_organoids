@@ -46,6 +46,7 @@ coverage.xml
 *.cover
 .hypothesis/
 /tests/user_data
+test_*
 
 # Translations
 *.mo
