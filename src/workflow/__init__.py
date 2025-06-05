@@ -1,7 +1,6 @@
 import os
 
 import datajoint as dj
-
 from dotenv import load_dotenv
 
 load_dotenv()

@@ -1,9 +1,10 @@
 import os
-import datajoint as dj
 from pathlib import Path
 
+import datajoint as dj
+
 from workflow import DB_PREFIX
-from workflow.utils.paths import get_raw_root_data_dir, get_processed_root_data_dir
+from workflow.utils.paths import get_processed_root_data_dir, get_raw_root_data_dir
 
 logger = dj.logger
 
@@ -80,7 +81,7 @@ def upload_session_data(session_dir_relpath):
             )
 
     if set(local_files) != set(remote_files):
-        raise AssertionError(f"Incomplete data upload - try again")
+        raise AssertionError("Incomplete data upload - try again")
     else:
         # create and upload an empty textfile named "upload_completed.txt" to signal the completion of this uploading round
         upload_completed_fp = local_session_dir / "upload_completed.txt"

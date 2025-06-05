@@ -37,7 +37,7 @@ services:
           devices:
             - driver: nvidia
               count: 1
-              capabilities: [gpu]
+              capabilities: [ gpu ]
     volumes:
       - ${OUTBOX_MOUNTPOINT:-./outbox}:${OUTBOX_MOUNTPOINT:-./outbox}
       - ${S3_ROOT_MOUNTPOINT:-./s3_root}:${S3_ROOT_MOUNTPOINT:-./s3_root}

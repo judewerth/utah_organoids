@@ -2,7 +2,8 @@ import os
 from typing import Any
 
 import datajoint as dj
-from element_array_ephys import probe, ephys_no_curation as ephys, ephys_report
+from element_array_ephys import ephys_no_curation as ephys
+from element_array_ephys import ephys_report, probe
 from element_array_ephys.spike_sorting import si_spike_sorting as ephys_sorter
 
 from workflow import DB_PREFIX, ORG_NAME, WORKFLOW_NAME

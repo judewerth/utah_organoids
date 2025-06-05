@@ -1,8 +1,8 @@
-import datajoint as dj
 import subprocess
 from pathlib import Path
 from typing import Any, Literal
 
+import datajoint as dj
 from element_interface.utils import find_full_path
 
 

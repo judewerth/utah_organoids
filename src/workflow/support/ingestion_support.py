@@ -1,19 +1,16 @@
 import re
+import shutil
 from datetime import datetime
 from pathlib import Path
+
 import datajoint as dj
 import numpy as np
-import shutil
 from element_interface.utils import find_full_path
 
 from workflow import REL_PATH_INBOX, SUPPORT_DB_PREFIX
 from workflow.pipeline import ephys
 from workflow.support import FileManifest
-
-from workflow.utils.paths import (
-    get_raw_root_data_dir,
-    get_processed_root_data_dir,
-)
+from workflow.utils.paths import get_processed_root_data_dir, get_raw_root_data_dir
 
 logger = dj.logger  # type: ignore
 
@@ -60,7 +57,7 @@ class FileProcessing(dj.Imported):
 
 @schema
 class PostEphys(dj.Imported):
-    definition = """ 
+    definition = """
     -> ephys.WaveformSet
     ---
     file_count: int
