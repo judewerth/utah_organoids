@@ -46,7 +46,13 @@ coverage.xml
 *.cover
 .hypothesis/
 /tests/user_data
+
+# datajoint test/other files
 test_*
+test-*
+testing
+scripts/LFP analysis # Jan's pipeline
+.env
 
 # Translations
 *.mo
