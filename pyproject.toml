@@ -23,7 +23,7 @@ classifiers = [
     "Programming Language :: Python :: 3",
 ]
 dependencies = [
-    "datajoint>=0.13",
+    "datajoint @ git+https://github.com/datajoint/datajoint-python.git",
     "datajoint-utilities @ git+https://github.com/datajoint-company/datajoint-utilities.git",
     "djsciops",
     "docker",
