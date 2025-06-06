@@ -1,5 +1,12 @@
 # Changelog
 
+## `V0.17.1`
+
+### Features
+
+- update: `datajoint` to latest version in `pyproject.toml`
+
+
 ## `V0.17.0`
 
 ### Features
