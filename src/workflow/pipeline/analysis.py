@@ -2,14 +2,25 @@ import datajoint as dj
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import signal
+import os
 
-from workflow import DB_PREFIX
+from workflow import DB_PREFIX, ORG_NAME, WORKFLOW_NAME
 
 from .ephys import ephys
 
 schema = dj.schema(DB_PREFIX + "analysis")
 
 logger = dj.logger
+
+
+dj.config["stores"]["datajoint-blob"] = dict(
+    protocol="s3",
+    endpoint="s3.amazonaws.com:9000",
+    bucket="dj-sciops",
+    location=f"{ORG_NAME}_{WORKFLOW_NAME}/datajoint/blob",
+    access_key=os.getenv("AWS_ACCESS_KEY", None),
+    secret_key=os.getenv("AWS_ACCESS_SECRET", None),
+)
 
 
 @schema
@@ -106,9 +117,9 @@ class LFPSpectrogram(dj.Computed):
         definition = """
         -> master
         ---
-        spectrogram: longblob  # Spectrogram matrix (freq x time) (μV²/Hz)
-        time: longblob         # Time bins (s)
-        frequency: longblob    # Frequency bins (Hz)
+        spectrogram: blob@datajoint-blob  # Spectrogram matrix (freq x time) (μV²/Hz)
+        time: blob@datajoint-blob         # Time bins (s)
+        frequency: blob@datajoint-blob    # Frequency bins (Hz)
         """
 
     class ChannelPower(dj.Part):
@@ -118,7 +129,7 @@ class LFPSpectrogram(dj.Computed):
         -> master
         -> SpectralBand
         ---
-        power_time_series: longblob  # Power time series for this band (μV²/Hz)
+        power_time_series: blob@datajoint-blob  # Power time series for this band (μV²/Hz)
         mean_power: float            # Mean band power (μV²/Hz)
         std_power: float             # Std dev of band power (μV²/Hz)
         """
