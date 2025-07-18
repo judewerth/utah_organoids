@@ -1,7 +1,5 @@
 import datajoint as dj
 from workflow import DB_PREFIX
-import os
-from typing import Any
 
 from . import lineage
 
