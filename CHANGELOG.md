@@ -1,5 +1,13 @@
 # Changelog
 
+## `V0.18.0`
+
+### Features
+
+- fix: in mua, `_build_si_recording_object`for a new version of SI where `extractorlist` no longer exists
+- fix: in mua, update`return_scaled` to `return_in_uV`
+
+
 ## `V0.17.1`
 
 ### Features
