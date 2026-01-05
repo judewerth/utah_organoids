@@ -139,4 +139,7 @@ config.yaml
 # Mac
 .DS_Store
 
+# Documentation
+README.md
+
 
