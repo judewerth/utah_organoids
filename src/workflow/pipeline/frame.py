@@ -14,10 +14,13 @@ from scipy.signal import find_peaks, coherence, butter, sosfiltfilt, hilbert
 from scipy.interpolate import interp1d
 from scipy.ndimage import gaussian_filter1d
 from specparam import SpectralModel
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import matplotlib.pyplot as plt
 import plotly.tools as tls
 import plotly.io as pio
+import neo
+import quantities as pq
+from elephant.spike_train_correlation import spike_time_tiling_coefficient
 
 
 """
@@ -207,6 +210,19 @@ def map_channel_to_electrode(channel_ids):
     electrode_ids = lookup[channel_ids]
     
     return electrode_ids
+
+def map_electrode_to_channel(electrode_ids):
+
+    electrode_mapping, channel_mapping = probe.ElectrodeConfig.Electrode.fetch("electrode", "channel_idx")
+
+    # create lookup to convert
+    lookup = np.empty(32, dtype=int)
+    lookup[electrode_mapping] = channel_mapping
+
+    # correctly map electrode indices
+    channel_ids = lookup[electrode_ids]
+    
+    return channel_ids
 
 def create_population_firing_vector(spike_rates, start_times, electrode_ids, num_elec_inside):
 
@@ -403,7 +419,7 @@ class Coherence(dj.Computed):
         """
 
     @property
-    def key_source(self):
+    def key_source(self): # only process sessions with all electrode traces processed
         
         # find the number of electrodes for each probe type
         num_electrodes = dj.U('probe_type').aggr(
@@ -859,3 +875,193 @@ class PopulationBursts(dj.Computed):
             'burst_bounds': burst_bounds,
             'burst_spike_array': burst_spike_array,
         })
+
+"""
+analysis.STTFA
+"""
+@schema
+class STTFA(dj.Imported):
+    """
+    Spike-Triggered Time-Frequency Analysis (STTFA) for each electrodes. Shows the impact of spikes on LFP spectral power.
+    """
+
+    definition = """
+    -> analysis.LFPSpectrogram.ChannelSpectrogram
+    ---
+    spike_count: int # number of spikes 
+    STTFA: longblob  # average frequency power during spike-triggered time window 
+    rSTTFA: longblob # randomized STTFA (random spike times)
+    nSTTFA: longblob # normalized STTFA (log(STTFA) - log(rSTTFA))
+    frequency: longblob  # frequency values
+    """
+
+    @property
+    def key_source(self): # only process sessions with all MUA spikes processed
+
+        # find all unique start and end times for spectrogram sessions
+        spectrogram_time_keys = dj.U('organoid_id', 'start_time', 'end_time').aggr(
+            analysis.LFPSpectrogram
+        ).fetch(as_dict=True)
+
+        # extract mua session information
+        mua_organoid_ids, mua_start_times, mua_channel_ids, mua_spike_counts = (mua.MUASpikes.Channel).fetch('organoid_id', 'start_time', 'channel_idx', 'spike_count')
+
+        # find times that have been compleely processed for MUA spikes
+        valid_time_keys = []
+        for time_key in spectrogram_time_keys:
+            
+            # determine the number of expected MUA sessions
+            num_expected_mua_sessions = np.ceil((time_key['end_time'] - time_key['start_time']) / timedelta(minutes=1)).astype(int)
+
+            # determine the number of existing MUA sessions
+            spectrogram_session_bool = (mua_organoid_ids == time_key['organoid_id']) & (mua_start_times >= (time_key['start_time'] - timedelta(seconds=59))) & (mua_start_times <= time_key['end_time'])
+            
+            # if there are too few mua sessions, don't process
+            num_mua_sessions = len(np.unique(mua_start_times[spectrogram_session_bool]))
+            if num_mua_sessions >= num_expected_mua_sessions: # will sometimes have 1 extra session due to boundaries
+                valid_time_keys.append(time_key)
+
+        return (
+            analysis.LFPSpectrogram.ChannelSpectrogram 
+            & valid_time_keys
+        )
+
+    def make(self, key):
+
+        # define parameters
+        fs = 20000 # sampling frequency in Hz
+        min_spikes = 10 # minimum number of spikes to perform STTFA 
+        max_freq = 200 # Hz
+
+        # find the channel idx for the spectrogram electrode
+        channel_idx = map_electrode_to_channel(np.array([key['electrode']]))[0]
+
+        # fetch MUA parameters within the spectrogram time window
+        spike_indices, start_times = (mua.MUASpikes.Channel & 
+                                                    f"organoid_id='{key['organoid_id']}'" &
+                                                    f"start_time BETWEEN '{key['start_time']}' AND '{key['end_time']}'" &
+                                                    f"channel_idx = '{channel_idx}'"
+                                                    ).fetch('spike_indices', 'start_time')
+        
+        # skip if not enough spikes
+        if len(np.hstack(spike_indices)) < min_spikes:
+            return
+
+        # get array of all spike times (relative to frame start)
+        start_ms = (start_times - key['start_time']).astype('timedelta64[ms]') / np.timedelta64(1, 'ms') # ms from frame start
+        rel_spike_times_ms = spike_indices / fs / (np.timedelta64(1,'ms')/np.timedelta64(1,'s')) 
+        spike_times_ms = np.hstack(rel_spike_times_ms + start_ms).astype(int) # relative to spectrogram start time
+
+        # remove boundary spikes (account for MUA outside spectrogram time)
+        num_ms = (key['end_time'] - key['start_time']) / timedelta(milliseconds=1)
+        spike_times_ms = spike_times_ms[(0 <= spike_times_ms) & (spike_times_ms <= num_ms)]
+
+        # fetch spectrogram
+        freq, time, spectrogram = (analysis.LFPSpectrogram.ChannelSpectrogram & key).fetch1('frequency', 'time', 'spectrogram')
+
+        # convert time to ms
+        time_ms = (time * 1000).astype(int)  # in ms
+
+        # calculate STTFA
+        sttfa_array = []
+        for spike_time in spike_times_ms:
+
+            # find time value closest to spike time
+            time_idx = np.argmin(np.abs(time_ms - spike_time))
+
+            # extract spectrogram within window
+            sttfa_array.append(spectrogram[(freq <= max_freq), time_idx])
+        sttfa_array = np.vstack(sttfa_array)  # shape: (num_spikes, frequency)
+
+        STTFA = np.mean(sttfa_array, axis=0)  # shape: (frequency)
+
+        spike_count = sttfa_array.shape[0]
+        frequency = freq[freq <= max_freq]
+
+        # calculate randomized STTFA
+        random_spike_times = np.random.choice(time_ms, size=spike_count, replace=False)
+        rsttfa_array = []
+        for spike_time in random_spike_times:
+
+            # find time value closest to spike time
+            time_idx = np.argmin(np.abs(time_ms - spike_time))
+
+            # extract spectrogram within window
+            rsttfa_array.append(spectrogram[(freq <= max_freq), time_idx])
+        rsttfa_array = np.vstack(rsttfa_array)  # shape: (num_spikes, frequency)
+
+        rSTTFA = np.mean(rsttfa_array, axis=0)  # shape: (frequency)
+
+        # calculate normalized STTFA
+        nSTTFA = np.log10(STTFA) - np.log10(rSTTFA)  # shape: (frequency)
+
+        # insert into table
+        self.insert1(
+            {
+                **key,
+                'spike_count': spike_count,
+                'STTFA': STTFA,
+                'rSTTFA': rSTTFA,
+                'nSTTFA': nSTTFA,
+                'frequency': frequency,
+            }
+        )
+
+"""
+ephys.STTC
+"""
+@schema
+class STTC(dj.Computed):
+    """
+    Spike Time Tiling Coefficient (STTC) between unit pairs. Automatically computed within ephys sessions (spike sorting).
+    """
+
+    definition = """
+    -> ephys.CuratedClustering
+    unit_a: int  # First unit in the pair
+    unit_b: int  # Second unit in the pair
+    ---
+    STTC: longblob  # STTC values corresponding to paired units
+    """
+
+    def make(self, key):
+
+        # define parameters
+        dt = 20 # ms
+
+        # fetch spike times for all units in the clustering
+        unit_ids, spike_times = (ephys.CuratedClustering.Unit & key).fetch('unit', 'spike_times', order_by='unit')
+
+        num_units = len(unit_ids)
+        t_stop = (key['end_time'] - key['start_time']) / timedelta(milliseconds=1)  # in ms
+
+        # loop through unit pairs and calculate STTC
+        for i in range(num_units):
+            for j in range(num_units):
+
+                # skip duplicate pairs
+                if i >= j:
+                    continue
+
+                # get spike times (convert from seconds to miliseconds)
+                spikes_A = (spike_times[i] * (timedelta(seconds=1) / timedelta(milliseconds=1))).astype(int)  
+                spikes_B = (spike_times[j] * (timedelta(seconds=1) / timedelta(milliseconds=1))).astype(int)  
+
+                # convert to spike trains (neo)
+                spiketrain_A = neo.SpikeTrain(spikes_A, units='ms', t_stop=t_stop)
+                spiketrain_B = neo.SpikeTrain(spikes_B, units='ms', t_stop=t_stop)
+
+                # calculate STTC
+                STTC = spike_time_tiling_coefficient(spiketrain_A, spiketrain_B, dt=dt*pq.ms)
+
+                # insert into table
+                self.insert1(
+                    {
+                        **key,
+                        'unit_a': unit_ids[i],
+                        'unit_b': unit_ids[j],
+                        'STTC': STTC
+                    }
+                )
+
+
