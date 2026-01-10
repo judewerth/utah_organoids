@@ -758,9 +758,9 @@ class PopulationBursts(dj.Computed):
     definition = """
     -> BurstSession
     ---
-    burst_indices: longblob # Indices of detected bursts within the time frame
+    burst_indices: longblob # ms since start of detected bursts within the time frame
     burst_peak_heights: longblob # Peak heights of detected bursts
-    burst_bounds: longblob # Start and end indices of detected bursts (firing rate >= 10%% of peak height)
+    burst_bounds: longblob # [-ms, +ms] relative to burst peak (firing rate >= 10%% of peak height)
     burst_spike_array: longblob # Single electrode spike array for each burst (num_bursts x num_electrodes x time_window)
     """
 
@@ -863,7 +863,7 @@ class PopulationBursts(dj.Computed):
                 burst_spike_times = elec_spike_times[((index-num_burst_samples) <= elec_spike_times) & (elec_spike_times <= (index+num_burst_samples))]
 
                 # convert to indices within burst spike array
-                burst_spike_indices = (burst_spike_times - (index-num_burst_samples)).astype(int)
+                burst_spike_indices = (burst_spike_times - (index-num_burst_samples) - 1).astype(int)
                 burst_spike_array[burst_idx, elec_idx, burst_spike_indices] = True
         burst_bounds = np.array(burst_windows)
 
@@ -880,7 +880,7 @@ class PopulationBursts(dj.Computed):
 analysis.STTFA
 """
 @schema
-class STTFA(dj.Imported):
+class STTFA(dj.Computed):
     """
     Spike-Triggered Time-Frequency Analysis (STTFA) for each electrodes. Shows the impact of spikes on LFP spectral power.
     """
@@ -889,9 +889,9 @@ class STTFA(dj.Imported):
     -> analysis.LFPSpectrogram.ChannelSpectrogram
     ---
     spike_count: int # number of spikes 
-    STTFA: longblob  # average frequency power during spike-triggered time window 
-    rSTTFA: longblob # randomized STTFA (random spike times)
-    nSTTFA: longblob # normalized STTFA (log(STTFA) - log(rSTTFA))
+    a_sttfa: longblob  # average frequency power during spike-triggered time window 
+    r_sttfa: longblob # randomized STTFA (random spike times)
+    n_sttfa: longblob # normalized STTFA (log(STTFA) - log(rSTTFA))
     frequency: longblob  # frequency values
     """
 
@@ -904,7 +904,7 @@ class STTFA(dj.Imported):
         ).fetch(as_dict=True)
 
         # extract mua session information
-        mua_organoid_ids, mua_start_times, mua_channel_ids, mua_spike_counts = (mua.MUASpikes.Channel).fetch('organoid_id', 'start_time', 'channel_idx', 'spike_count')
+        mua_organoid_ids, mua_start_times = (mua.MUASpikes).fetch('organoid_id', 'start_time')
 
         # find times that have been compleely processed for MUA spikes
         valid_time_keys = []
@@ -932,6 +932,7 @@ class STTFA(dj.Imported):
         fs = 20000 # sampling frequency in Hz
         min_spikes = 10 # minimum number of spikes to perform STTFA 
         max_freq = 200 # Hz
+        num_rand_iterations = 1000 # number of randomizations for rSTTFA
 
         # find the channel idx for the spectrogram electrode
         channel_idx = map_electrode_to_channel(np.array([key['electrode']]))[0]
@@ -944,7 +945,8 @@ class STTFA(dj.Imported):
                                                     ).fetch('spike_indices', 'start_time')
         
         # skip if not enough spikes
-        if len(np.hstack(spike_indices)) < min_spikes:
+        spike_count = len(np.hstack(spike_indices))
+        if spike_count < min_spikes:
             return
 
         # get array of all spike times (relative to frame start)
@@ -963,46 +965,34 @@ class STTFA(dj.Imported):
         time_ms = (time * 1000).astype(int)  # in ms
 
         # calculate STTFA
-        sttfa_array = []
-        for spike_time in spike_times_ms:
+        spike_indices_spec_bins = np.histogram(spike_times_ms, bins=np.concatenate([[0], time_ms]))[0]
+        a_sttfa = (spectrogram * spike_indices_spec_bins).sum(axis=1) / spike_count
 
-            # find time value closest to spike time
-            time_idx = np.argmin(np.abs(time_ms - spike_time))
-
-            # extract spectrogram within window
-            sttfa_array.append(spectrogram[(freq <= max_freq), time_idx])
-        sttfa_array = np.vstack(sttfa_array)  # shape: (num_spikes, frequency)
-
-        STTFA = np.mean(sttfa_array, axis=0)  # shape: (frequency)
-
-        spike_count = sttfa_array.shape[0]
+        a_sttfa = a_sttfa[freq <= max_freq]
         frequency = freq[freq <= max_freq]
 
         # calculate randomized STTFA
-        random_spike_times = np.random.choice(time_ms, size=spike_count, replace=False)
-        rsttfa_array = []
-        for spike_time in random_spike_times:
+        r_sttfa_list = []
+        for _ in range(num_rand_iterations):
+            rand_spike_times = np.random.choice(time_ms, size=spike_count, replace=False)
 
-            # find time value closest to spike time
-            time_idx = np.argmin(np.abs(time_ms - spike_time))
+            rand_spike_indices_spec_bins = np.histogram(rand_spike_times, bins=np.concatenate([[0], time_ms]))[0]
+            r_sttfa = (spectrogram * rand_spike_indices_spec_bins).sum(axis=1) / spike_count
+            r_sttfa_list.append(r_sttfa[freq <= max_freq])
 
-            # extract spectrogram within window
-            rsttfa_array.append(spectrogram[(freq <= max_freq), time_idx])
-        rsttfa_array = np.vstack(rsttfa_array)  # shape: (num_spikes, frequency)
-
-        rSTTFA = np.mean(rsttfa_array, axis=0)  # shape: (frequency)
+        r_sttfa = np.mean(np.vstack(r_sttfa_list), axis=0)
 
         # calculate normalized STTFA
-        nSTTFA = np.log10(STTFA) - np.log10(rSTTFA)  # shape: (frequency)
+        n_sttfa = np.log10(a_sttfa) - np.log10(r_sttfa)  # shape: (frequency)
 
         # insert into table
         self.insert1(
             {
                 **key,
                 'spike_count': spike_count,
-                'STTFA': STTFA,
-                'rSTTFA': rSTTFA,
-                'nSTTFA': nSTTFA,
+                'a_sttfa': a_sttfa,
+                'r_sttfa': r_sttfa,
+                'n_sttfa': n_sttfa,
                 'frequency': frequency,
             }
         )
@@ -1014,26 +1004,36 @@ ephys.STTC
 class STTC(dj.Computed):
     """
     Spike Time Tiling Coefficient (STTC) between unit pairs. Automatically computed within ephys sessions (spike sorting).
+    Based on the method described in Sharf et al. (2022) Nature Communications.
     """
 
     definition = """
     -> ephys.CuratedClustering
+    -> PopulationBursts
     unit_a: int  # First unit in the pair
     unit_b: int  # Second unit in the pair
     ---
-    STTC: longblob  # STTC values corresponding to paired units
+    sttc: float  # STTC value between unit pairs
+    spike_time_latencies: longblob  # Latencies (ms) of spikes from unit A to nearest spike in unit B during (limited to +/- dt) 
+    null_sttc_mean: float  # Mean of null distribution of STTC values (randomized spike times during population bursts)
+    null_sttc_values: longblob  # Null distribution of STTC values (randomized spike times during population bursts)
+    null_sttc_bins: longblob  # Bins for null distribution histogram
     """
 
     def make(self, key):
 
         # define parameters
-        dt = 20 # ms
+        dt = 20 # ms    
 
         # fetch spike times for all units in the clustering
         unit_ids, spike_times = (ephys.CuratedClustering.Unit & key).fetch('unit', 'spike_times', order_by='unit')
 
         num_units = len(unit_ids)
         t_stop = (key['end_time'] - key['start_time']) / timedelta(milliseconds=1)  # in ms
+        
+        # initialize arrays
+        sttc_array = np.empty((num_units, num_units))
+        spike_time_latencies_array = np.empty((num_units, num_units), dtype=object)
 
         # loop through unit pairs and calculate STTC
         for i in range(num_units):
@@ -1052,16 +1052,105 @@ class STTC(dj.Computed):
                 spiketrain_B = neo.SpikeTrain(spikes_B, units='ms', t_stop=t_stop)
 
                 # calculate STTC
-                STTC = spike_time_tiling_coefficient(spiketrain_A, spiketrain_B, dt=dt*pq.ms)
+                sttc = spike_time_tiling_coefficient(spiketrain_A, spiketrain_B, dt=dt*pq.ms)
 
-                # insert into table
+                # calculate spike time latencies
+                spike_time_latencies = []
+                for spike_time in spikes_A:
+                    # find nearest spike in B within +/- dt
+                    time_diffs = spikes_B - spike_time
+                    valid_diffs = time_diffs[np.abs(time_diffs) <= dt]
+                    if len(valid_diffs) > 0:
+                        nearest_latency = valid_diffs[np.argmin(np.abs(valid_diffs))]
+                        spike_time_latencies.append(nearest_latency)
+
+                # insert into arrays
+                sttc_array[i, j] = sttc
+                spike_time_latencies_array[i, j] = spike_time_latencies
+
+        # calculate null distribution of STTC values (randomized spike times during population bursts)
+        # extract times of population bursts
+        burst_indices, burst_bounds = (PopulationBursts & key).fetch1('burst_indices', 'burst_bounds')
+        burst_times_ms = burst_indices[:, np.newaxis] + burst_bounds
+
+        # minimum number of data points for null distribution (per pair wise comparison)
+        num_values = 200
+        if len(burst_times_ms) > num_values:
+            selected_indices = np.random.choice(len(burst_times_ms), size=num_values, replace=False)
+            burst_times_ms = burst_times_ms[selected_indices]
+
+        # determine number of iterations needed to reach num_values
+        num_iterations = np.ceil(num_values / len(burst_times_ms)).astype(int)
+
+        # loop through bursts and extract null distribution of STTC values
+        null_sttc_bins = np.arange(-1, 1.05, 0.05)
+        null_sttc_array = np.empty((num_units, num_units), dtype=object)
+        for burst_start, burst_end in burst_times_ms:
+
+            # create single unit spike array for burst duration (binary)
+            burst_duration_ms = burst_end - burst_start
+
+            burst_spike_array = np.zeros((burst_duration_ms, num_units), dtype=bool)
+            for unit_idx in range(num_units):
+                unit_spike_times = (spike_times[unit_idx] * (timedelta(seconds=1) / timedelta(milliseconds=1))).astype(int)
+                burst_unit_spike_times = unit_spike_times[(burst_start <= unit_spike_times) & (unit_spike_times <= burst_end)] - burst_start
+                burst_spike_array[burst_unit_spike_times, unit_idx] = True
+
+            # itrate to create null distributions
+            for _ in range(num_iterations):
+                
+                # randomize unit ids for each spike time
+                randomized_spike_array = np.zeros_like(burst_spike_array)
+                for ms in range(burst_duration_ms):
+                    n_true = np.sum(burst_spike_array[ms])  # Count True values in this row
+                    shuffled_units = np.random.choice(num_units, size=n_true, replace=False)
+                    randomized_spike_array[ms, shuffled_units] = True       
+                    
+                # loop through unit pairs and calculate STTC
+                for i in range(num_units):
+                    for j in range(num_units):
+
+                        # skip duplicate pairs
+                        if i >= j:
+                            continue
+
+                        # get spike times from randomized array
+                        rand_spikes_A = np.where(randomized_spike_array[:, i])[0]
+                        rand_spikes_B = np.where(randomized_spike_array[:, j])[0]
+
+                        # convert to spike trains (neo)
+                        rand_spiketrain_A = neo.SpikeTrain(rand_spikes_A, units='ms', t_stop=burst_duration_ms*pq.ms)
+                        rand_spiketrain_B = neo.SpikeTrain(rand_spikes_B, units='ms', t_stop=burst_duration_ms*pq.ms)
+
+                        # calculate STTC
+                        rand_sttc = spike_time_tiling_coefficient(rand_spiketrain_A, rand_spiketrain_B, dt=dt*pq.ms)
+                        
+                        # insert into array
+                        if null_sttc_array[i, j] is None:
+                            null_sttc_array[i, j] = []
+                        null_sttc_array[i, j].append(rand_sttc)
+            
+        # insert into table
+        for i in range(num_units):
+            for j in range(num_units):
+
+                # skip duplicate pairs
+                if i >= j:
+                    continue
+                
+                null_sttc = np.array(null_sttc_array[i, j])[~np.isnan(null_sttc_array[i, j])]
+                null_sttc_mean = np.mean(null_sttc) if len(null_sttc) > 0 else np.nan
+                null_sttc_values = np.histogram(null_sttc, bins=null_sttc_bins)[0]
+
                 self.insert1(
                     {
                         **key,
                         'unit_a': unit_ids[i],
                         'unit_b': unit_ids[j],
-                        'STTC': STTC
+                        'sttc': sttc_array[i, j],
+                        'spike_time_latencies': np.array(spike_time_latencies_array[i, j]),
+                        'null_sttc_mean': null_sttc_mean,
+                        'null_sttc_values': null_sttc_values,
+                        'null_sttc_bins': null_sttc_bins,
                     }
                 )
-
-
