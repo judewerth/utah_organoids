@@ -637,12 +637,15 @@ class FOOOFAnalysis(dj.Computed):
         spec_param_idx = (analysis.LFPSpectrogram & key).fetch("param_idx")[0]
 
         # fetch lfp spectrograms
-        spectrograms = (analysis.LFPSpectrogram.ChannelSpectrogram & key & f"electrode IN {tuple(analysis_electrodes)}").fetch("spectrogram")
+        if len(analysis_electrodes) > 0:
+            spectrograms = (analysis.LFPSpectrogram.ChannelSpectrogram & key & f"electrode IN {tuple(analysis_electrodes)}").fetch("spectrogram")
+        else:
+            spectrograms = (analysis.LFPSpectrogram.ChannelSpectrogram & key).fetch("spectrogram")
         spectrograms = np.stack(spectrograms, axis=-1)  # shape: (frequency, time, electrodes)
         mean_spectrum = np.mean(spectrograms, axis=(1, 2))  # shape: (frequency,)
 
         # fetch frequency vector
-        frequency = (analysis.LFPSpectrogram.ChannelSpectrogram & key & f"electrode IN {tuple(analysis_electrodes)}").fetch("frequency")[0]
+        frequency = (analysis.LFPSpectrogram.ChannelSpectrogram & key).fetch("frequency")[0]
 
         # fetch fooof parameters
         peak_width_limits, max_n_peaks, min_peak_height, peak_threshold, aperiodic_mode = (FOOOFParamset & key).fetch1(
@@ -686,6 +689,9 @@ class FOOOFAnalysis(dj.Computed):
 
         # Peaks (safe for 0 peaks)
         peak_params = fm.get_params('peak_params')  # shape: (n_peaks, 3)
+        if peak_params.ndim == 1:
+            peak_params = peak_params[np.newaxis, :]  # reshape to (1, 3)
+
         peak_center_frequencies = peak_params[:, 0].tolist() if peak_params.size else []
         peak_powers = peak_params[:, 1].tolist() if peak_params.size else []
         peak_bandwidths = peak_params[:, 2].tolist() if peak_params.size else []
