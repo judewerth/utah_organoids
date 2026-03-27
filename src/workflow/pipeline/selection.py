@@ -1,23 +1,21 @@
-# Import Modules
 import datajoint as dj
-from workflow import DB_PREFIX
-from element_array_ephys.ephys_no_curation import map_channel_to_electrode, get_probe_type
-
-from workflow.pipeline import culture, ephys, mua
-
 import numpy as np
 import bottleneck as bn
 from scipy.signal import find_peaks
 from datetime import timedelta
+from element_array_ephys.ephys_no_curation import map_channel_to_electrode, get_probe_type
 
-# Set up schema (connects to database and manages table creation)
-schema = dj.schema(DB_PREFIX + "frame")
+from workflow import DB_PREFIX
+from workflow.pipeline import culture, mua
+from .ephys import ephys
 
-# Define Lookup Table 
+schema = dj.schema(DB_PREFIX + "selection")
+
+
 @schema
-class TimeFrameParamset(dj.Lookup):
+class FrameParamset(dj.Lookup):
     """
-    Time frame extraction parameters for LFP and spike analyses. 
+    Time frame extraction parameters for LFP and spike analyses.
     """
 
     definition = """
@@ -32,21 +30,21 @@ class TimeFrameParamset(dj.Lookup):
         (3, 8, 15), # 8 frames at 15 minutes each (2 hours total)
     ]
 
-# Define Manual Table
+
 @schema
 class FrameSession(dj.Manual):
     """
     Manually define time boundaries for analysis of each organoid session.
     """
 
-    definition = """ 
+    definition = """
     -> culture.Experiment
-    -> TimeFrameParamset
+    -> FrameParamset
     start_boundary     : datetime # Start datetime for analysis
     end_boundary       : datetime # End datetime for analysis
     """
 
-# Define Computed Table
+
 @schema
 class FrameAnalysis(dj.Computed):
     """
@@ -73,19 +71,26 @@ class FrameAnalysis(dj.Computed):
         """
 
     def make(self, key):
-        
-        # fetch electrode parameters
-        num_elec_inside = (culture.NumElectrodesInside & key).fetch1('num_electrodes')
+
+        # fetch electrode count from implantation image (source of truth)
+        img_query = culture.OrganoidImplantationImage & {"organoid_id": key["organoid_id"]}
+        if not img_query:
+            raise ValueError(f"No OrganoidImplantationImage entry found for organoid_id='{key['organoid_id']}' - insert a row before running this computation")
+        if len(img_query) > 1:
+            raise ValueError(f"Multiple OrganoidImplantationImage entries found for organoid_id='{key['organoid_id']}' - expected exactly one")
+        num_elec_inside = img_query.fetch1("num_electrodes_inside")
+        if num_elec_inside is None:
+            raise ValueError(f"num_electrodes_inside is not set in OrganoidImplantationImage for organoid_id='{key['organoid_id']}'")
 
         # fetch frame parameters
-        num_frames, min_per_frame = (TimeFrameParamset & key).fetch1('num_frames', 'min_per_frame')
+        num_frames, min_per_frame = (FrameParamset & key).fetch1('num_frames', 'min_per_frame')
 
         # fetch number of processed sessions and available files
         num_processed_sessions = len(mua.MUASpikes & f"organoid_id='{key['organoid_id']}'" & f"start_time BETWEEN '{key['start_boundary']}' AND '{key['end_boundary']}'")
         num_files = len(ephys.EphysRawFile & f"file_time BETWEEN '{key['start_boundary']}' AND '{key['end_boundary']}'")
 
-        # fetch MUA values (needs to be previously )
-        spike_rates, start_times, channel_ids = (mua.MUASpikes.Channel & 
+        # fetch MUA values
+        spike_rates, start_times, channel_ids = (mua.MUASpikes.Channel &
                                                     f"organoid_id='{key['organoid_id']}'" &
                                                     f"start_time BETWEEN '{key['start_boundary']}' AND '{key['end_boundary']}'"
                                                     ).fetch('spike_rate', 'start_time', 'channel_idx')
@@ -104,11 +109,11 @@ class FrameAnalysis(dj.Computed):
 
         # insert the parent FrameAnalysis record
         self.insert1({
-            **key, 
-            'num_processed_sessions': num_processed_sessions, 
+            **key,
+            'num_processed_sessions': num_processed_sessions,
             'num_available_files': num_files})
 
-        # insert active frames (and acompannying ephys sessions)
+        # insert active frames
         for active_frame in active_frames:
 
             # insert into frame table
@@ -117,15 +122,26 @@ class FrameAnalysis(dj.Computed):
                 'frame_start': active_frame['frame_start'],
                 'frame_end': active_frame['frame_end'],
                 'frame_firing_rate': active_frame['frame_firing_rate'],
-            }) 
+            })
 
-# Define used functions
+
+@schema
+class TraceSession(dj.Manual):
+    """
+    Manual insert of MUA trace plotting sessions.
+    """
+
+    definition = """
+    -> mua.MUASpikes.Channel
+    """
+
+
 def create_population_firing_vector(spike_rates, start_times, electrode_ids, num_elec_inside):
 
     # create full time vector from recording start to end (1 minute increments)
     unique_start_times = np.unique(start_times)
     time_vector = np.arange(min(unique_start_times.astype("datetime64[m]")), max(unique_start_times.astype("datetime64[m]"))+np.timedelta64(1, 'm'), np.timedelta64(1, 'm')) # full array of recording timeline (needed to account for missing data)
-    population_firing_vector = np.zeros(time_vector.shape)    
+    population_firing_vector = np.zeros(time_vector.shape)
 
     # loop through start times and insert data into population firing vector
     for start_time in unique_start_times:
@@ -133,13 +149,14 @@ def create_population_firing_vector(spike_rates, start_times, electrode_ids, num
         time_bool = (start_times == start_time)
 
         # only consider electrodes inside organoid
-        elec_bool = (electrode_ids < num_elec_inside)
+        elec_bool = (electrode_ids >= 0) & (electrode_ids < num_elec_inside)
 
         # sum valid electrodes for each time window (minute)
         time_index = np.where(time_vector == np.datetime64(start_time, 'm'))[0][0]
         population_firing_vector[time_index] = np.sum(spike_rates[time_bool & elec_bool])
-    
+
     return time_vector, population_firing_vector
+
 
 def find_active_frames(start_times, time_vector, filtered_population_firing_vector, population_firing_vector, num_frames, min_per_frame):
 
@@ -147,18 +164,18 @@ def find_active_frames(start_times, time_vector, filtered_population_firing_vect
     frame_indices, properties = find_peaks(filtered_population_firing_vector, height=0, distance=min_per_frame)
     frame_amplitudes = properties['peak_heights']
 
-    # remove boundary peaks (these will raise an error when trying to extract burst windows)
-    boundary_bool = (min_per_frame <= frame_indices)
+    # remove boundary peaks (lower and upper) — frame window must fit within time_vector
+    boundary_bool = (min_per_frame <= frame_indices) & (frame_indices + 1 < len(time_vector))
 
     frame_indices = frame_indices[boundary_bool]
     frame_amplitudes = frame_amplitudes[boundary_bool]
-    
+
     # find most active regions -> extract windows
     active_frame_indices = frame_indices[np.argsort(frame_amplitudes)[-num_frames:]]  # indexes of the most active peaks
-    
+
     active_frames = []
     for active_frame_idx in active_frame_indices:
-        
+
         # determine frame boundaries
         frame_bounds = np.array([-min_per_frame, 0]) + active_frame_idx + 1
 
@@ -174,5 +191,5 @@ def find_active_frames(start_times, time_vector, filtered_population_firing_vect
                 'frame_firing_rate': frame_firing_rate
             }
         )
-    
-    return active_frames      
+
+    return active_frames
