@@ -1,14 +1,17 @@
 import tempfile
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
 import datajoint as dj
 import matplotlib.pyplot as plt
 import numpy as np
+import spikeinterface as si
 
 from workflow import DB_PREFIX
-from workflow.pipeline import analysis, ephys, ephys_sorter
+from workflow.pipeline import analysis, coupling, culture, ephys, ephys_sorter, mua, selection
+from workflow.pipeline.ephys import probe
 from workflow.pipeline.patch_clamp_ephys import schema_ephys as patch_clamp
+from workflow.pipeline.mua import _get_si_recording, _plot_trace_with_peaks
 
 logger = dj.logger
 schema = dj.schema(DB_PREFIX + "report")
@@ -325,3 +328,80 @@ class PatchClampReport(dj.Computed):
                     self.VICurve.insert1({**key, 'vi_plot': str(full_path)})
                 else:
                     logger.warning(f"V-I plot not found: {full_path}")
+
+
+@schema
+class MUASelectedTracePlot(dj.Computed):
+    """
+    Generate plot of a user-selected MUA trace with detected spike peaks.
+    """
+
+    definition = """
+    -> selection.TraceSession
+    ---
+    electrode: int # electrode idx when mapped (tip=0)
+    trace_plot: longblob  # Plot of trace with spike peaks (as json)
+    """
+
+    def make(self, key):
+        # fetch MUA channel data
+        start_time, channel_idx, spike_indices = (mua.MUASpikes.Channel & key).fetch1("start_time", "channel_idx", "spike_indices")
+
+        # get spike interface recording object
+        port_id = (mua.MUAEphysSession & key).fetch1("port_id")
+        parent_folder = (culture.ExperimentDirectory & key).fetch1(
+            "experiment_directory"
+        )
+        end_time = start_time + timedelta(minutes=1)  # 1 minute duration
+        si_recording = _get_si_recording(start_time, end_time, parent_folder, port_id)
+
+        # Preprocess the recording
+        si_recording = si.preprocessing.bandpass_filter(
+            recording=si_recording, freq_min=300, freq_max=6000
+        )
+        si_recording = si.preprocessing.common_reference(
+            recording=si_recording, operator="median"
+        )
+
+        # get trace info
+        times = si_recording.get_times()
+        title = f"{key['organoid_id']} | {key['start_time']} | ChnID: {channel_idx}"
+
+        ch_id = si_recording.channel_ids[channel_idx]
+        trace = np.squeeze(
+            si_recording.get_traces(channel_ids=[ch_id], return_scaled=True)
+        )
+
+        trace_fig = _plot_trace_with_peaks(
+            trace, times, spike_indices, f"ch_{ch_id}", title
+        )
+
+        # get electrode
+        from element_array_ephys.ephys_no_curation import map_channel_to_electrode
+        probe_type = set((ephys.EphysSessionProbe * probe.Probe & f"organoid_id = '{key['organoid_id']}'").fetch('probe_type'))
+        if len(probe_type) != 1:
+            raise ValueError(f"Expected exactly one probe type for organoid_id='{key['organoid_id']}', found {len(probe_type)}")
+        electrode = map_channel_to_electrode(probe_type.pop(), input_indices=np.array([channel_idx]))[0]
+
+        self.insert1(
+            {
+                **key,
+                "electrode": electrode,
+                "trace_plot": trace_fig.to_json(),
+            }
+        )
+
+
+@schema
+class CouplingReport(dj.Computed):
+    """
+    Report plots for phase-amplitude coupling analysis.
+    """
+
+    definition = """
+    -> coupling.PhaseAmplitudeCoupling
+    ---
+    """
+
+    def make(self, key):
+        raise NotImplementedError("CouplingReport.make() not yet implemented.")
