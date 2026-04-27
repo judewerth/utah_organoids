@@ -15,6 +15,7 @@ from element_array_ephys.ephys_no_curation import map_channel_to_electrode, get_
 from element_interface.utils import find_full_path
 from tensorpac import Pac, PreferredPhase, EventRelatedPac
 from tensorpac.utils import ITC, PeakLockedTF
+
 from .ephys import ephys, probe
 from workflow.pipeline import mua, frame
 
@@ -151,7 +152,7 @@ class LFPSpectrogram(dj.Computed):
     @property
     def key_source(self):
         # Use only the default param_idx for high-gamma windowing params for automated population
-        return ephys.LFP.Trace * SpectrogramParameters & "param_idx=2"
+        return ephys.LFP.Trace * SpectrogramParameters & "param_idx=0"
 
     def make(self, key):
         # Load LFP trace and sampling rate
@@ -515,11 +516,14 @@ class FOOOFAnalysis(dj.Computed):
         time, frequency = np.array((LFPSpectrogram.ChannelSpectrogram & key).fetch("time", "frequency"))[:,0]
 
         # fetch lfp spectrograms (averaged across electrodes)
-        if len(analysis_electrodes) > 0:
-            spectrograms = (LFPSpectrogram.ChannelSpectrogram & key & f"electrode IN {tuple(analysis_electrodes)}").fetch("spectrogram")
-        else:
+        if len(analysis_electrodes) == 0:
             spectrograms = (LFPSpectrogram.ChannelSpectrogram & key).fetch("spectrogram")
-        mean_spectrum = np.mean(np.stack(spectrograms, axis=-1), axis=2)  # shape: (frequency, time)
+        elif len(analysis_electrodes) == 1:
+            spectrograms = (LFPSpectrogram.ChannelSpectrogram & key & f"electrode = {analysis_electrodes[0]}").fetch("spectrogram")
+        else:
+            spectrograms = (LFPSpectrogram.ChannelSpectrogram & key & f"electrode IN {tuple(analysis_electrodes)}").fetch("spectrogram")
+
+        mean_spectrum = np.mean(np.stack(spectrograms, axis=-1), axis=-1)  # shape: (frequency, time)
 
         # fetch fooof parameters
         peak_width_limits, max_n_peaks, min_peak_height, peak_threshold, aperiodic_mode = (FOOOFParamset & key).fetch1(
@@ -560,10 +564,13 @@ class FOOOFAnalysis(dj.Computed):
         json_fig = pio.to_json(plotly_fig)
 
         # extract summary parameters
-        summary_params = {name: fm.get_params(name) for name in ['aperiodic_params', 'peak_params', 'metrics']}
+        aperiodic_params = fm.get_params('aperiodic')
+        summary_params = {
+            "aperiodic_params": aperiodic_params,
+            "periodic_params": fm.get_params('periodic'),
+            "quality_metrics": np.array([fm.get_metrics('error_mae'), fm.get_metrics('gof_rsquared')])
+        }
 
-        # get aperiodic fit
-        aperiodic_params = fm.get_params('aperiodic_params')
         if aperiodic_mode == 'fixed':
             offset, exponent = aperiodic_params
             aperiodic_fit = 10**(offset - exponent * np.log10(bounded_frequency))
@@ -608,7 +615,7 @@ class FOOOFAnalysis(dj.Computed):
             interp_epoch_spectrum = interp_epoch_spectrum[np.isin(frequency, bounded_frequency)]  # restrict to bounded frequency
 
             # extract aperiodic fit parameters
-            aperiodic_params = fm.get_params('aperiodic_params')
+            aperiodic_params = fm.get_params('aperiodic')
 
             # get aperiodic fit
             if aperiodic_mode == 'fixed':
@@ -635,10 +642,9 @@ class FOOOFAnalysis(dj.Computed):
                     epoch_data[f"{band_name}_heights"].append(np.max(interp_epoch_spectrum[band_mask] - aperiodic_fit[band_mask])) # store max height above aperiodic fit
 
             # extract fit metrics
-            metrics = fm.get_params("metrics")
-            epoch_data["mae"].append(metrics["error_mae"])
-            epoch_data["r_squared"].append(metrics["gof_rsquared"])
-        
+            epoch_data["mae"].append(fm.get_metrics('error_mae'))
+            epoch_data["r_squared"].append(fm.get_metrics('gof_rsquared'))
+
         # convert lists to arrays
         for key_name in epoch_data.keys():
             epoch_data[key_name] = np.array(epoch_data[key_name])
@@ -689,48 +695,49 @@ class STTFA(dj.Computed):
     frequency: longblob  # frequency values
     """
 
-    @property
-    def key_source(self): # only process sessions with all MUA spikes processed
+    # @property
+    # def key_source(self): # only process sessions with all MUA spikes processed
 
-        min_spikes = 10
+    #     min_spikes = 10
 
-        lfp_table = dj.U("organoid_id", "start_time", "end_time").aggr(LFPSpectrogram)
+    #     lfp_table = dj.U("organoid_id", "start_time", "end_time").aggr(LFPSpectrogram)
         
-        electrode_map = probe.ElectrodeConfig.Electrode.proj("channel_idx")
+    #     electrode_map = probe.ElectrodeConfig.Electrode.proj("channel_idx")
 
-        valid_keys = []
-        for lfp_key in lfp_table.fetch(as_dict=True):
+    #     valid_keys = []
+    #     for lfp_key in lfp_table.fetch(as_dict=True):
             
-            lfp_with_channel = ((LFPSpectrogram & lfp_key) * electrode_map).proj("channel_idx")
+    #         lfp_with_channel = ((LFPSpectrogram & lfp_key) * electrode_map).proj("channel_idx")
 
-            mua_keys = (mua.MUASpikes 
-                        & f"organoid_id = '{lfp_key['organoid_id']}'" 
-                        & f"start_time >= '{lfp_key['start_time']}'" 
-                        & f"start_time < '{lfp_key['end_time']}'").fetch("KEY")
+    #         mua_keys = (mua.MUASpikes 
+    #                     & f"organoid_id = '{lfp_key['organoid_id']}'" 
+    #                     & f"start_time >= '{lfp_key['start_time']}'" 
+    #                     & f"start_time < '{lfp_key['end_time']}'").fetch("KEY")
             
-            summed_spikes_table = lfp_with_channel.aggr(
-                (mua.MUASpikes.Channel & mua_keys).proj("spike_count", mua_start="start_time"),
-                "channel_idx",
-                total_spike_count="sum(spike_count)"
-            )
+    #         summed_spikes_table = lfp_with_channel.aggr(
+    #             (mua.MUASpikes.Channel & mua_keys).proj("spike_count", mua_start="start_time"),
+    #             "channel_idx",
+    #             total_spike_count="sum(spike_count)"
+    #         )
 
-            electrodes, total_spikes = summed_spikes_table.fetch("electrode", "total_spike_count")
+    #         electrodes, total_spikes = summed_spikes_table.fetch("electrode", "total_spike_count")
 
-            min_spikes_bool = total_spikes >= min_spikes
-            for electrode in electrodes[min_spikes_bool]:
-                valid_keys.append({
-                    **lfp_key,
-                    "electrode": electrode
-                })
+    #         min_spikes_bool = total_spikes >= min_spikes
+    #         for electrode in electrodes[min_spikes_bool]:
+    #             valid_keys.append({
+    #                 **lfp_key,
+    #                 "electrode": electrode
+    #             })
 
-        return (
-            LFPSpectrogram.ChannelSpectrogram 
-            & valid_keys
-        )
+    #     return (
+    #         LFPSpectrogram.ChannelSpectrogram 
+    #         & valid_keys
+    #     )
 
     def make(self, key):
 
         # define parameters
+        min_spikes = 10
         fs = 20000 # sampling frequency in Hz
         max_freq = 300 # Hz
         num_rand_iterations = 1000 # number of randomizations for rSTTFA
@@ -756,6 +763,19 @@ class STTFA(dj.Computed):
         spike_times_ms = spike_times_ms[(0 <= spike_times_ms) & (spike_times_ms <= num_ms)]
 
         spike_count = len(spike_times_ms)
+
+        if spike_count < min_spikes:
+            self.insert1(
+                {
+                    **key,
+                    'spike_count': spike_count,
+                    'a_sttfa': [],
+                    'r_sttfa': [],
+                    'n_sttfa': [],
+                    'frequency': [],
+                }
+            )
+            return
 
         # fetch spectrogram
         freq, time, spectrogram = (LFPSpectrogram.ChannelSpectrogram & key).fetch1('frequency', 'time', 'spectrogram')

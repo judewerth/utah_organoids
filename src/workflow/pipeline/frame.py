@@ -3,7 +3,8 @@ import datajoint as dj
 from workflow import DB_PREFIX
 from element_array_ephys.ephys_no_curation import map_channel_to_electrode, get_probe_type
 
-from workflow.pipeline import culture, ephys, mua
+from .ephys import ephys
+from workflow.pipeline import culture, mua
 
 import numpy as np
 import bottleneck as bn
